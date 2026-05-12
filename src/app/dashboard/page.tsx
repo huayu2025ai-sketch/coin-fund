@@ -127,7 +127,7 @@ function DashboardInner() {
   });
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 dark:bg-[#0b1120]">
+    <main className="min-h-screen bg-[#F8FAFC] p-4 sm:p-6 lg:p-10 dark:bg-[#0b1120]">
       <div className="mx-auto max-w-7xl">
         {/* ── 顶部栏 ── */}
         <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
@@ -151,9 +151,9 @@ function DashboardInner() {
             </div>
 
             {/* 状态 */}
-            <div className="flex items-center gap-1.5">
+            <div className="flex flex-wrap items-center gap-1.5">
               <Activity className="h-3 w-3 text-slate-400 dark:text-slate-500" />
-              <span className="text-xs text-slate-400 dark:text-slate-500">{updatedAtText}</span>
+              <span className="hidden text-xs text-slate-400 dark:text-slate-500 sm:inline">{updatedAtText}</span>
               <span
                 className={
                   prices.stale
@@ -185,7 +185,7 @@ function DashboardInner() {
               <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">资产分布</h2>
               <span className="text-xs text-slate-400 dark:text-slate-500">成本基准 vs 市值</span>
             </div>
-            <div className="h-[280px] sm:h-[320px]">
+            <div className="h-[240px] sm:h-[280px] lg:h-[320px]">
               <ResponsiveContainer height="100%" width="100%">
                 <BarChart data={positions}>
                   <defs>
@@ -238,7 +238,7 @@ function DashboardInner() {
           <div className="ui-card ui-interactive p-6 lg:p-8">
             <h2 className="mb-5 text-sm font-semibold text-slate-900 dark:text-slate-100">持仓明细</h2>
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-sm">
+              <table className="w-full min-w-[560px] text-sm">
                 <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   <tr className="border-b border-slate-100 dark:border-slate-800">
                     <th className="w-20 py-2.5 font-medium whitespace-nowrap">资产</th>
@@ -299,7 +299,7 @@ function DashboardInner() {
             </div>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[720px] text-sm">
+              <table className="w-full min-w-[640px] text-sm">
                 <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   <tr className="border-b border-slate-100 dark:border-slate-800">
                     <th className="py-2.5 font-medium">日期</th>

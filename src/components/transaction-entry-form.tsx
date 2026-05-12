@@ -106,7 +106,7 @@ export function TransactionEntryForm() {
         <div className="text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
           交易信息
         </div>
-        <div className="grid gap-x-5 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
+        <div className="grid gap-x-4 gap-y-4 sm:grid-cols-2 xl:grid-cols-4">
           <Field label="资产">
             <select
               className="ui-input h-11 w-full px-4 text-sm"
@@ -142,7 +142,7 @@ export function TransactionEntryForm() {
       </div>
 
       {/* 操作区 */}
-      <div className="grid gap-x-5 gap-y-4 border-t border-slate-100 dark:border-slate-800 pt-7 md:grid-cols-[160px_180px_1fr_auto] md:items-end">
+      <div className="grid gap-x-4 gap-y-4 border-t border-slate-100 dark:border-slate-800 pt-7 sm:grid-cols-2 md:grid-cols-[160px_180px_1fr_auto] md:items-end">
         <Field label="现金投入（USD）">
           <NumberInput
             value={form.cashAmountUsd}
@@ -172,7 +172,7 @@ export function TransactionEntryForm() {
           />
         </Field>
         <button
-          className="ui-btn-primary ui-interactive inline-flex h-12 items-center justify-center gap-2 rounded-xl px-8 text-sm font-semibold disabled:opacity-50"
+          className="ui-btn-primary ui-interactive flex h-12 items-center justify-center gap-2 rounded-xl px-8 text-sm font-semibold disabled:opacity-50 sm:inline-flex"
           disabled={mutation.isPending}
           type="submit"
         >
