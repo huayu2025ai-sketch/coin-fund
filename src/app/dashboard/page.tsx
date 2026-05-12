@@ -185,7 +185,33 @@ function DashboardInner() {
                   <CartesianGrid stroke="#f8fafc" vertical={false} />
                   <XAxis axisLine={false} dataKey="asset" tick={{ fill: "#94a3b8", fontSize: 12 }} tickLine={false} />
                   <YAxis axisLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} tickFormatter={(value) => compactUsd.format(value)} tickLine={false} />
-                  <Tooltip formatter={(value) => usd.format(Number(value))} />
+                  <Tooltip
+                    content={({ active, payload, label }) => {
+                      if (!active || !payload?.length) return null;
+                      return (
+                        <div className="rounded-xl border border-slate-100 bg-white px-4 py-3 shadow-lg dark:border-slate-700 dark:bg-[#1e293b]">
+                          <div className="mb-1.5 text-xs font-semibold text-slate-900 dark:text-slate-100">
+                            {label}
+                          </div>
+                          {payload.map((entry) => (
+                            <div key={entry.dataKey} className="flex items-center gap-2 py-0.5 text-sm">
+                              <span
+                                className="h-2.5 w-2.5 rounded-sm"
+                                style={{ background: entry.color }}
+                              />
+                              <span className="text-slate-500 dark:text-slate-400">
+                                {entry.dataKey === "costBasisUsd" ? "成本基准" : "市值"}
+                              </span>
+                              <span className="ml-auto font-medium text-slate-900 dark:text-slate-100">
+                                {usd.format(Number(entry.value))}
+                              </span>
+                            </div>
+                          ))}
+                        </div>
+                      );
+                    }}
+                    cursor={{ fill: "rgba(148,163,184,0.06)" }}
+                  />
                   <Bar dataKey="costBasisUsd" fill="url(#barCost)" radius={[8, 8, 0, 0]} />
                   <Bar dataKey="marketValueUsd" fill="url(#barMarket)" radius={[8, 8, 0, 0]} />
                 </BarChart>
