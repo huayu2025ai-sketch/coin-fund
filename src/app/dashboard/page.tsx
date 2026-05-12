@@ -28,6 +28,7 @@ import {
   calculateTotals,
   compactUsd,
   percent,
+  type Asset,
   type PortfolioTransaction,
   type PriceMap,
   usd,
@@ -149,9 +150,9 @@ function DashboardInner() {
   }, [todayLabel, transactions]);
 
   return (
-    <main className="min-h-screen p-8 ui-title">
-      <div className="mx-auto grid w-full max-w-7xl gap-8 lg:grid-cols-[272px_1fr]">
-        <aside className="ui-glass p-6">
+    <main className="min-h-screen bg-[#F8FAFC] p-8">
+      <div className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[280px_1fr]">
+        <aside className="ui-glass ui-interactive p-8">
           <p className="text-xs font-medium uppercase tracking-[0.14em] text-slate-500">
             Crypto2028
           </p>
@@ -168,7 +169,7 @@ function DashboardInner() {
             <PriceChip icon={Database} label="SOL" value={usd.format(prices.SOL)} />
           </div>
 
-          <div className="mt-8 rounded-2xl border border-blue-100 bg-blue-50/80 p-4">
+          <div className="mt-8 rounded-2xl border border-blue-100 bg-blue-50/50 p-5">
             <div className="flex items-center gap-2 text-xs font-medium text-blue-700">
               <Activity className="h-3.5 w-3.5" />
               行情状态
@@ -182,8 +183,8 @@ function DashboardInner() {
           </div>
         </aside>
 
-        <section className="grid gap-8">
-          <div className="grid gap-6 sm:grid-cols-2 xl:grid-cols-5">
+        <section className="grid gap-10">
+          <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-5">
             <MetricCard label="市值" value={usd.format(totals.marketValueUsd)} />
             <MetricCard label="成本基准" value={usd.format(totals.costBasisUsd)} />
             <MetricCard label="总盈亏" value={usd.format(totals.pnlUsd)} tone={totals.pnlUsd >= 0 ? "green" : "red"} />
@@ -191,10 +192,10 @@ function DashboardInner() {
             <MetricCard label="原始现金投入" value={usd.format(totals.originalCashUsd)} />
           </div>
 
-          <div className="ui-card p-8">
-            <div className="mb-4 flex items-center justify-between gap-4">
+          <div className="ui-card ui-interactive p-8">
+            <div className="mb-6 flex items-center justify-between gap-4">
               <h2 className="text-sm font-semibold ui-title">资产分布</h2>
-              <span className="text-xs text-slate-500">成本基准 vs 市值</span>
+              <span className="text-xs text-slate-400">成本基准 vs 市值</span>
             </div>
             <div className="h-[304px]">
               <ResponsiveContainer height="100%" width="100%">
@@ -209,58 +210,56 @@ function DashboardInner() {
                       <stop offset="100%" stopColor="#8b5cf6" />
                     </linearGradient>
                   </defs>
-                  <CartesianGrid stroke="#f1f5f9" vertical={false} />
-                  <XAxis axisLine={false} dataKey="asset" tick={{ fill: "#64748b", fontSize: 11 }} tickLine={false} />
-                  <YAxis axisLine={false} tick={{ fill: "#64748b", fontSize: 11 }} tickFormatter={(value) => compactUsd.format(value)} tickLine={false} />
+                  <CartesianGrid stroke="#f8fafc" vertical={false} />
+                  <XAxis axisLine={false} dataKey="asset" tick={{ fill: "#94a3b8", fontSize: 12 }} tickLine={false} />
+                  <YAxis axisLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} tickFormatter={(value) => compactUsd.format(value)} tickLine={false} />
                   <Tooltip formatter={(value) => usd.format(Number(value))} />
-                  <Bar dataKey="costBasisUsd" fill="url(#barCost)" radius={[10, 10, 0, 0]} />
-                  <Bar dataKey="marketValueUsd" fill="url(#barMarket)" radius={[10, 10, 0, 0]} />
+                  <Bar dataKey="costBasisUsd" fill="url(#barCost)" radius={[8, 8, 0, 0]} />
+                  <Bar dataKey="marketValueUsd" fill="url(#barMarket)" radius={[8, 8, 0, 0]} />
                 </BarChart>
               </ResponsiveContainer>
             </div>
           </div>
 
-          <div className="grid gap-8 xl:grid-cols-[1.25fr_0.75fr]">
-            <div className="ui-card p-8">
-              <h2 className="mb-4 text-sm font-semibold ui-title">持仓明细</h2>
+          <div className="grid gap-10 xl:grid-cols-[1.25fr_0.75fr]">
+            <div className="ui-card ui-interactive p-8">
+              <h2 className="mb-6 text-sm font-semibold ui-title">持仓明细</h2>
               <div className="overflow-x-auto">
                 <table className="w-full min-w-[760px] text-sm">
-                  <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-500">
-                    <tr className="border-b border-slate-200">
-                      <th className="py-4 font-medium">资产</th>
-                      <th className="py-4 text-right font-medium">数量</th>
-                      <th className="py-4 text-right font-medium">平均成本</th>
-                      <th className="py-4 text-right font-medium">价格</th>
-                      <th className="py-4 text-right font-medium">价值</th>
-                      <th className="py-4 text-right font-medium">盈亏</th>
-                      <th className="py-4 text-right font-medium">ROI</th>
-                      <th className="py-4 text-right font-medium">转换价值</th>
+                  <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400">
+                    <tr className="border-b border-slate-100">
+                      <th className="py-3 font-medium">资产</th>
+                      <th className="py-3 text-right font-medium">数量</th>
+                      <th className="py-3 text-right font-medium">平均成本</th>
+                      <th className="py-3 text-right font-medium">价格</th>
+                      <th className="py-3 text-right font-medium">价值</th>
+                      <th className="py-3 text-right font-medium">盈亏</th>
+                      <th className="py-3 text-right font-medium">ROI</th>
+                      <th className="py-3 text-right font-medium">转换价值</th>
                     </tr>
                   </thead>
                   <tbody>
                     {positions.map((position) => (
-                      <tr className="border-b border-slate-100" key={position.asset}>
-                        <td className="py-5 font-medium text-slate-900">
-                          <span className="inline-flex items-center gap-2">
-                            <span className="inline-flex h-6 w-6 items-center justify-center rounded-md bg-slate-100 text-xs font-semibold shadow-sm shadow-indigo-100/50">
-                              {position.asset.slice(0, 1)}
-                            </span>
+                      <tr className="border-b border-slate-50 transition-colors hover:bg-slate-50/60" key={position.asset}>
+                        <td className="py-4 font-medium text-slate-900">
+                          <span className="inline-flex items-center gap-2.5">
+                            <AssetBadge asset={position.asset} />
                             {position.asset}
                           </span>
                         </td>
-                        <td className="py-5 text-right text-slate-700">{position.quantity.toFixed(8)}</td>
-                        <td className="py-5 text-right text-slate-700">{usd.format(position.avgCostUsd)}</td>
-                        <td className="py-5 text-right text-slate-700">{usd.format(position.marketPriceUsd)}</td>
-                        <td className="py-5 text-right text-slate-700">{usd.format(position.marketValueUsd)}</td>
-                        <td className={position.pnlUsd >= 0 ? "py-5 text-right font-medium text-emerald-600" : "py-5 text-right font-medium text-red-600"}>
+                        <td className="py-4 text-right text-slate-600">{position.quantity.toFixed(8)}</td>
+                        <td className="py-4 text-right text-slate-600">{usd.format(position.avgCostUsd)}</td>
+                        <td className="py-4 text-right text-slate-600">{usd.format(position.marketPriceUsd)}</td>
+                        <td className="py-4 text-right font-medium text-slate-900">{usd.format(position.marketValueUsd)}</td>
+                        <td className={position.pnlUsd >= 0 ? "py-4 text-right font-medium text-emerald-600" : "py-4 text-right font-medium text-red-600"}>
                           {usd.format(position.pnlUsd)}
                         </td>
-                        <td className="py-5 text-right">
-                          <span className={position.roi >= 0 ? "inline-flex rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700" : "inline-flex rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700"}>
+                        <td className="py-4 text-right">
+                          <span className={position.roi >= 0 ? "inline-flex rounded-full bg-emerald-50 px-3 py-1 text-xs font-medium text-emerald-600" : "inline-flex rounded-full bg-red-50 px-3 py-1 text-xs font-medium text-red-600"}>
                             {percent.format(position.roi)}
                           </span>
                         </td>
-                        <td className="py-5 text-right text-slate-700">{usd.format(position.conversionValueUsd)}</td>
+                        <td className="py-4 text-right text-slate-600">{usd.format(position.conversionValueUsd)}</td>
                       </tr>
                     ))}
                   </tbody>
@@ -268,28 +267,28 @@ function DashboardInner() {
               </div>
             </div>
 
-            <div className="grid gap-8">
-              <div className="ui-card p-8">
-                <div className="mb-4 flex items-center justify-between">
+            <div className="grid gap-10">
+              <div className="ui-card ui-interactive p-8">
+                <div className="mb-6 flex items-center justify-between">
                   <h2 className="text-sm font-semibold ui-title">资金来源</h2>
-                  <ArrowUpRight className="h-4 w-4 text-blue-600" />
+                  <ArrowUpRight className="h-4 w-4 text-blue-500" />
                 </div>
                 <div className="h-[220px]">
                   <ResponsiveContainer height="100%" width="100%">
                     <AreaChart data={timeline}>
                       <defs>
                         <linearGradient id="cashFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.3} />
+                          <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.25} />
                           <stop offset="100%" stopColor="#60a5fa" stopOpacity={0} />
                         </linearGradient>
                         <linearGradient id="convFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.28} />
+                          <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.22} />
                           <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
                         </linearGradient>
                       </defs>
-                      <CartesianGrid stroke="#f1f5f9" vertical={false} />
-                      <XAxis axisLine={false} dataKey="date" tick={{ fill: "#64748b", fontSize: 11 }} tickLine={false} />
-                      <YAxis axisLine={false} tick={{ fill: "#64748b", fontSize: 11 }} tickFormatter={(value) => compactUsd.format(value)} tickLine={false} />
+                      <CartesianGrid stroke="#f8fafc" vertical={false} />
+                      <XAxis axisLine={false} dataKey="date" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} />
+                      <YAxis axisLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} tickFormatter={(value) => compactUsd.format(value)} tickLine={false} />
                       <Tooltip formatter={(value) => usd.format(Number(value))} />
                       <Area dataKey="cash" fill="url(#cashFill)" stroke="#3b82f6" strokeWidth={2} type="monotone" />
                       <Area dataKey="conversion" fill="url(#convFill)" stroke="#8b5cf6" strokeWidth={2} type="monotone" />
@@ -321,7 +320,7 @@ function DashboardInner() {
                 </div>
               </div>
 
-              <div className="ui-card p-8">
+              <div className="ui-card ui-interactive p-8">
                 <TransactionEntryForm />
               </div>
             </div>
@@ -342,13 +341,28 @@ function PriceChip({
   value: string;
 }) {
   return (
-    <div className="ui-chip ui-interactive flex items-center justify-between px-4 py-3 hover:scale-[1.02]">
-      <div className="flex items-center gap-2 text-sm font-medium text-slate-700">
-        <Icon className="h-4 w-4 text-blue-600" />
+    <div className="ui-chip ui-interactive flex items-center justify-between px-5 py-3.5">
+      <div className="flex items-center gap-2.5 text-sm font-medium text-slate-700">
+        <Icon className="h-4 w-4 text-blue-500" />
         {label}
       </div>
-      <span className="ui-title text-sm font-semibold">{value}</span>
+      <span className="text-sm font-semibold text-slate-900">{value}</span>
     </div>
+  );
+}
+
+function AssetBadge({ asset }: { asset: Asset }) {
+  const styles =
+    asset === "BTC"
+      ? "bg-amber-50 text-amber-700 border-amber-100"
+      : asset === "ETH"
+        ? "bg-indigo-50 text-indigo-700 border-indigo-100"
+        : "bg-emerald-50 text-emerald-700 border-emerald-100";
+
+  return (
+    <span className={`inline-flex h-7 w-7 items-center justify-center rounded-full border text-[11px] font-bold ${styles}`}>
+      {asset.slice(0, 1)}
+    </span>
   );
 }
 
@@ -371,17 +385,10 @@ function MetricCard({
   return (
     <div>
       <div className="ui-label mb-2">{label}</div>
-      <div className="ui-card ui-interactive p-5 hover:scale-[1.02]">
-        <div className={tone === "red" ? "text-xl font-medium tracking-tight text-red-600" : `text-2xl font-semibold tracking-tight ${toneClass}`}>
+      <div className="ui-card ui-interactive p-5">
+        <div className={`text-2xl font-semibold tracking-tight ${toneClass}`}>
           {value}
         </div>
-        {label === "ROI" ? (
-          <div className="mt-3">
-            <span className={tone === "red" ? "rounded-full bg-red-100 px-3 py-1 text-xs font-medium text-red-700" : "rounded-full bg-emerald-100 px-3 py-1 text-xs font-medium text-emerald-700"}>
-              {value}
-            </span>
-          </div>
-        ) : null}
       </div>
     </div>
   );

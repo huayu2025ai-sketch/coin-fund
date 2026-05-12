@@ -5,8 +5,8 @@
 :root {
   --bg-main: #f8fafc;
   --bg-accent: #ffffff;
-  --text-main: #111827;
-  --text-subtle: #4b5563;
+  --text-main: #0f172a;
+  --text-subtle: #64748b;
   --brand: #2563eb;
 }
 
@@ -27,7 +27,7 @@ body {
   }
 
   .ui-subtitle {
-    @apply text-slate-600;
+    @apply text-slate-500;
   }
 
   .ui-label {
@@ -35,26 +35,26 @@ body {
   }
 
   .ui-card {
-    @apply rounded-3xl border border-slate-200/80 bg-white shadow-sm shadow-indigo-100/50;
+    @apply rounded-3xl border border-slate-100 bg-white shadow-[0_1px_3px_rgba(0,0,0,0.08)];
   }
 
   .ui-glass {
-    @apply rounded-3xl border border-white/60 bg-white/45 shadow-sm shadow-indigo-100/50 backdrop-blur-xl;
+    @apply rounded-3xl border border-white/60 bg-white/60 shadow-[0_1px_3px_rgba(0,0,0,0.08)] backdrop-blur-xl;
   }
 
   .ui-chip {
-    @apply rounded-2xl border border-white/80 bg-white/80 shadow-sm shadow-indigo-100/50;
+    @apply rounded-2xl border border-slate-100 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.06)];
   }
 
   .ui-input {
-    @apply rounded-xl border border-slate-200 bg-white shadow-sm shadow-indigo-100/50 outline-none transition-all duration-150 ease-out focus:border-blue-300 focus:ring-2 focus:ring-blue-100;
+    @apply rounded-xl border border-slate-200 bg-white shadow-[0_1px_2px_rgba(0,0,0,0.04)] outline-none transition-all duration-200 ease-out focus:border-blue-300 focus:ring-2 focus:ring-blue-100;
   }
 
   .ui-btn-primary {
-    @apply bg-blue-600 text-white shadow-md shadow-indigo-100/50 transition-all duration-150 ease-out hover:bg-blue-500;
+    @apply rounded-xl bg-blue-600 text-white shadow-[0_1px_3px_rgba(37,99,235,0.3)] transition-all duration-200 ease-out hover:bg-blue-500;
   }
 
   .ui-interactive {
-    @apply transition-all duration-150 ease-out;
+    @apply transition-all duration-200 ease-out hover:translate-y-[-2px] hover:shadow-[0_4px_12px_rgba(0,0,0,0.08)];
   }
 }

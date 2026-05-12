@@ -132,21 +132,21 @@ export function TransactionEntryForm() {
 
   return (
     <form
-      className="grid gap-6 border-t border-slate-200 pt-6"
+      className="grid gap-6"
       onSubmit={(event) => {
         event.preventDefault();
         mutation.mutate();
       }}
     >
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-medium text-slate-900">新增交易</h2>
-        <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-slate-200 bg-white text-xs">
+        <h2 className="text-sm font-semibold text-slate-900">新增交易</h2>
+        <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs">
           {(["DCA", "CONVERSION"] as TransactionKind[]).map((kind) => (
             <button
               className={
                 form.kind === kind
-                  ? "bg-blue-600 px-4 py-2 text-white shadow-sm shadow-indigo-100/50 transition-all duration-150 ease-out"
-                  : "px-4 py-2 text-slate-600 transition-all duration-150 ease-out hover:scale-[1.02] hover:bg-slate-100"
+                  ? "rounded-lg bg-white px-4 py-2 font-medium text-slate-900 shadow-sm transition-all duration-200 ease-out"
+                  : "rounded-lg px-4 py-2 font-medium text-slate-500 transition-all duration-200 ease-out hover:text-slate-700"
               }
               key={kind}
               type="button"
@@ -232,12 +232,12 @@ export function TransactionEntryForm() {
               }
             />
           </Field>
-          <div className="rounded-xl border border-slate-200 bg-white px-4 py-3 text-xs text-slate-600 shadow-sm shadow-indigo-100/50">
+          <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-xs text-slate-500">
             <div className="flex items-center gap-2">
               <ArrowRight className="h-3.5 w-3.5" />
               {conversionRate.toFixed(6)} 来源代币 / {form.asset}
             </div>
-            <div>${conversionValueUsd.toFixed(2)} 转换价值</div>
+            <div className="mt-0.5 font-medium text-slate-700">${conversionValueUsd.toFixed(2)} 转换价值</div>
           </div>
         </div>
       )}
@@ -263,7 +263,7 @@ export function TransactionEntryForm() {
           />
         </Field>
         <button
-          className="ui-btn-primary ui-interactive inline-flex h-11 items-center justify-center gap-2 rounded-xl px-5 text-sm font-medium hover:scale-105 disabled:opacity-50"
+          className="ui-btn-primary ui-interactive inline-flex h-11 items-center justify-center gap-2 px-5 text-sm font-medium disabled:opacity-50"
           disabled={mutation.isPending}
           type="submit"
         >
