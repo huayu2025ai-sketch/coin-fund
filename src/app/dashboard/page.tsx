@@ -295,10 +295,10 @@ function DashboardInner() {
                       <Area dataKey="conversion" fill="url(#convFill)" stroke="#8b5cf6" strokeWidth={2} type="monotone" />
                       <Area
                         dataKey="cash"
-                        dot={(props) => {
+                        dot={(props: any) => {
                           const { cx, cy, payload } = props;
                           if (!payload?.highlight) {
-                            return null;
+                            return <circle cx={cx} cy={cy} fill="transparent" r={0} />;
                           }
                           return (
                             <circle
