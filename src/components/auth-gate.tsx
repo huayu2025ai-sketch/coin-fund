@@ -50,7 +50,7 @@ export function AuthGate({ children }: { children: ReactNode }) {
 
   if (!ready) {
     return (
-      <main className="grid min-h-screen place-items-center bg-white text-sm text-neutral-500">
+      <main className="grid min-h-screen place-items-center bg-white text-sm text-neutral-500 dark:bg-[#0b1120] dark:text-neutral-400">
         加载中
       </main>
     );

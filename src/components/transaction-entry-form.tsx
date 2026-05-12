@@ -140,14 +140,14 @@ export function TransactionEntryForm() {
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-slate-900">新增交易</h2>
-        <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs">
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">新增交易</h2>
+        <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-1 text-xs">
           {(["DCA", "CONVERSION"] as TransactionKind[]).map((kind) => (
             <button
               className={
                 form.kind === kind
-                  ? "rounded-lg bg-white px-4 py-2 font-medium text-slate-900 shadow-sm transition-all duration-200 ease-out"
-                  : "rounded-lg px-4 py-2 font-medium text-slate-500 transition-all duration-200 ease-out hover:text-slate-700"
+                  ? "rounded-lg bg-white dark:bg-[#1e293b] px-4 py-2 font-medium text-slate-900 dark:text-slate-100 shadow-sm transition-all duration-200 ease-out"
+                  : "rounded-lg px-4 py-2 font-medium text-slate-500 dark:text-slate-400 transition-all duration-200 ease-out hover:text-slate-700 dark:text-slate-300"
               }
               key={kind}
               type="button"
@@ -201,7 +201,7 @@ export function TransactionEntryForm() {
 
       {/* 来源代币 —— 仅换仓模式 */}
       {form.kind === "CONVERSION" && (
-        <div className="rounded-2xl border border-slate-100 bg-slate-50/40 p-5">
+        <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/40 p-5">
           <div className="mb-4 text-xs font-medium uppercase tracking-wider text-slate-400">
             来源代币
           </div>
@@ -236,11 +236,11 @@ export function TransactionEntryForm() {
               />
             </Field>
           </div>
-          <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-2.5 text-xs text-slate-500 shadow-sm">
+          <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#1e293b] px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400 shadow-sm">
             <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
             <span>兑换率 {conversionRate.toFixed(6)} 来源代币 / {form.asset}</span>
             <span className="mx-1 text-slate-300">|</span>
-            <span className="font-medium text-slate-700">${conversionValueUsd.toFixed(2)} 转换价值</span>
+            <span className="font-medium text-slate-700 dark:text-slate-300">${conversionValueUsd.toFixed(2)} 转换价值</span>
           </div>
         </div>
       )}
@@ -249,8 +249,8 @@ export function TransactionEntryForm() {
       <div
         className={
           form.kind === "DCA"
-            ? "grid gap-x-5 gap-y-4 border-t border-slate-100 pt-7 md:grid-cols-[160px_180px_1fr_auto] md:items-end"
-            : "grid gap-x-5 gap-y-4 border-t border-slate-100 pt-7 md:grid-cols-[180px_1fr_auto] md:items-end"
+            ? "grid gap-x-5 gap-y-4 border-t border-slate-100 dark:border-slate-800 pt-7 md:grid-cols-[160px_180px_1fr_auto] md:items-end"
+            : "grid gap-x-5 gap-y-4 border-t border-slate-100 dark:border-slate-800 pt-7 md:grid-cols-[180px_1fr_auto] md:items-end"
         }
       >
         {form.kind === "DCA" && (
@@ -295,7 +295,7 @@ export function TransactionEntryForm() {
 
       {/* 错误提示 */}
       {mutation.error ? (
-        <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+        <div className="rounded-xl border border-red-100 dark:border-red-900/30 bg-red-50 dark:bg-red-950/30 px-4 py-3 text-sm text-red-600 dark:text-red-400">
           {mutation.error.message}
         </div>
       ) : null}
@@ -312,7 +312,7 @@ function Field({
 }) {
   return (
     <label className="flex flex-col gap-2.5">
-      <span className="text-xs font-medium text-slate-500">{label}</span>
+      <span className="text-xs font-medium text-slate-500 dark:text-slate-400">{label}</span>
       {children}
     </label>
   );

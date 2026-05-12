@@ -30,6 +30,7 @@ import {
   usd,
 } from "@/lib/portfolio";
 import { getSupabaseClient } from "@/lib/supabase-client";
+import { ThemeToggle } from "@/components/theme-toggle";
 
 type PricesResponse = PriceMap & {
   stale: boolean;
@@ -110,43 +111,45 @@ function DashboardInner() {
   const totals = useMemo(() => calculateTotals(positions), [positions]);
 
   return (
-    <main className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10">
+    <main className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 dark:bg-[#0b1120]">
       <div className="mx-auto max-w-7xl">
         {/* ── 顶部栏 ── */}
         <header className="mb-8 flex flex-col gap-4 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-semibold tracking-tight text-slate-900 dark:text-slate-100">
               投资组合
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1 text-sm text-slate-500 dark:text-slate-400">
               成本、仓位与盈亏一屏查看。
             </p>
           </div>
 
           <div className="flex flex-wrap items-center gap-3">
             {/* 价格聚合条 */}
-            <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white px-5 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.08)]">
+            <div className="flex items-center gap-4 rounded-2xl border border-slate-100 bg-white px-5 py-2.5 shadow-[0_1px_3px_rgba(0,0,0,0.08)] dark:border-slate-800 dark:bg-[#1e293b] dark:shadow-[0_1px_3px_rgba(0,0,0,0.3)]">
               <PricePill icon={Coins} label="BTC" value={usd.format(prices.BTC)} />
-              <div className="h-3 w-px bg-slate-200" />
+              <div className="h-3 w-px bg-slate-200 dark:bg-slate-700" />
               <PricePill icon={Flame} label="ETH" value={usd.format(prices.ETH)} />
-              <div className="h-3 w-px bg-slate-200" />
+              <div className="h-3 w-px bg-slate-200 dark:bg-slate-700" />
               <PricePill icon={Database} label="SOL" value={usd.format(prices.SOL)} />
             </div>
 
             {/* 状态 */}
             <div className="flex items-center gap-1.5">
-              <Activity className="h-3 w-3 text-slate-400" />
-              <span className="text-xs text-slate-400">{updatedAtText}</span>
+              <Activity className="h-3 w-3 text-slate-400 dark:text-slate-500" />
+              <span className="text-xs text-slate-400 dark:text-slate-500">{updatedAtText}</span>
               <span
                 className={
                   prices.stale
-                    ? "ml-1 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-600"
-                    : "ml-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-600"
+                    ? "ml-1 rounded-full bg-red-50 px-2 py-0.5 text-[11px] font-medium text-red-600 dark:bg-red-950/30 dark:text-red-400"
+                    : "ml-1 rounded-full bg-emerald-50 px-2 py-0.5 text-[11px] font-medium text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400"
                 }
               >
                 {prices.stale ? "价格过期" : "数据正常"}
               </span>
             </div>
+
+            <ThemeToggle />
           </div>
         </header>
 
@@ -163,8 +166,8 @@ function DashboardInner() {
         <div className="mb-8 grid gap-6 xl:grid-cols-2">
           <div className="ui-card ui-interactive p-6 lg:p-8">
             <div className="mb-5 flex items-center justify-between gap-4">
-              <h2 className="text-sm font-semibold text-slate-900">资产分布</h2>
-              <span className="text-xs text-slate-400">成本基准 vs 市值</span>
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">资产分布</h2>
+              <span className="text-xs text-slate-400 dark:text-slate-500">成本基准 vs 市值</span>
             </div>
             <div className="h-[280px] sm:h-[320px]">
               <ResponsiveContainer height="100%" width="100%">
@@ -191,11 +194,11 @@ function DashboardInner() {
           </div>
 
           <div className="ui-card ui-interactive p-6 lg:p-8">
-            <h2 className="mb-5 text-sm font-semibold text-slate-900">持仓明细</h2>
+            <h2 className="mb-5 text-sm font-semibold text-slate-900 dark:text-slate-100">持仓明细</h2>
             <div className="overflow-x-auto">
               <table className="w-full min-w-[640px] text-sm">
-                <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400">
-                  <tr className="border-b border-slate-100">
+                <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <tr className="border-b border-slate-100 dark:border-slate-800">
                     <th className="py-2.5 font-medium">资产</th>
                     <th className="py-2.5 text-right font-medium">数量</th>
                     <th className="py-2.5 text-right font-medium">平均成本</th>
@@ -207,22 +210,22 @@ function DashboardInner() {
                 </thead>
                 <tbody>
                   {positions.map((position) => (
-                    <tr className="border-b border-slate-50 transition-colors hover:bg-slate-50/60" key={position.asset}>
-                      <td className="py-3 font-medium text-slate-900">
+                    <tr className="border-b border-slate-50 transition-colors hover:bg-slate-50/60 dark:border-slate-800/50 dark:hover:bg-slate-800/40" key={position.asset}>
+                      <td className="py-3 font-medium text-slate-900 dark:text-slate-100">
                         <span className="inline-flex items-center gap-2">
                           <AssetBadge asset={position.asset} />
                           {position.asset}
                         </span>
                       </td>
-                      <td className="py-3 text-right text-slate-600">{position.quantity.toFixed(8)}</td>
-                      <td className="py-3 text-right text-slate-600">{usd.format(position.avgCostUsd)}</td>
-                      <td className="py-3 text-right text-slate-600">{usd.format(position.marketPriceUsd)}</td>
-                      <td className="py-3 text-right font-medium text-slate-900">{usd.format(position.marketValueUsd)}</td>
-                      <td className={position.pnlUsd >= 0 ? "py-3 text-right font-medium text-emerald-600" : "py-3 text-right font-medium text-red-600"}>
+                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">{position.quantity.toFixed(8)}</td>
+                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">{usd.format(position.avgCostUsd)}</td>
+                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">{usd.format(position.marketPriceUsd)}</td>
+                      <td className="py-3 text-right font-medium text-slate-900 dark:text-slate-100">{usd.format(position.marketValueUsd)}</td>
+                      <td className={position.pnlUsd >= 0 ? "py-3 text-right font-medium text-emerald-600 dark:text-emerald-400" : "py-3 text-right font-medium text-red-600 dark:text-red-400"}>
                         {usd.format(position.pnlUsd)}
                       </td>
                       <td className="py-3 text-right">
-                        <span className={position.roi >= 0 ? "inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600" : "inline-flex rounded-full bg-red-50 px-2.5 py-0.5 text-[11px] font-medium text-red-600"}>
+                        <span className={position.roi >= 0 ? "inline-flex rounded-full bg-emerald-50 px-2.5 py-0.5 text-[11px] font-medium text-emerald-600 dark:bg-emerald-950/30 dark:text-emerald-400" : "inline-flex rounded-full bg-red-50 px-2.5 py-0.5 text-[11px] font-medium text-red-600 dark:bg-red-950/30 dark:text-red-400"}>
                           {percent.format(position.roi)}
                         </span>
                       </td>
@@ -254,9 +257,9 @@ function PricePill({
 }) {
   return (
     <div className="flex items-center gap-1.5">
-      <Icon className="h-3 w-3 text-slate-400" />
-      <span className="text-xs font-medium text-slate-400">{label}</span>
-      <span className="text-xs font-semibold text-slate-900">{value}</span>
+      <Icon className="h-3 w-3 text-slate-400 dark:text-slate-500" />
+      <span className="text-xs font-medium text-slate-400 dark:text-slate-500">{label}</span>
+      <span className="text-xs font-semibold text-slate-900 dark:text-slate-100">{value}</span>
     </div>
   );
 }
@@ -264,10 +267,10 @@ function PricePill({
 function AssetBadge({ asset }: { asset: Asset }) {
   const styles =
     asset === "BTC"
-      ? "bg-amber-50 text-amber-700 border-amber-100"
+      ? "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30"
       : asset === "ETH"
-        ? "bg-indigo-50 text-indigo-700 border-indigo-100"
-        : "bg-emerald-50 text-emerald-700 border-emerald-100";
+        ? "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30"
+        : "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30";
 
   return (
     <span className={`inline-flex h-6 w-6 items-center justify-center rounded-full border text-[10px] font-bold ${styles}`}>
@@ -287,14 +290,14 @@ function MetricCard({
 }) {
   const toneClass =
     tone === "green"
-      ? "text-emerald-600"
+      ? "text-emerald-600 dark:text-emerald-400"
       : tone === "red"
-        ? "text-red-600"
-        : "text-slate-900";
+        ? "text-red-600 dark:text-red-400"
+        : "text-slate-900 dark:text-slate-100";
 
   return (
     <div className="ui-card ui-interactive p-5">
-      <div className="mb-1 text-xs font-medium text-slate-400">{label}</div>
+      <div className="mb-1 text-xs font-medium text-slate-400 dark:text-slate-500">{label}</div>
       <div className={`text-xl font-semibold tracking-tight ${toneClass}`}>
         {value}
       </div>

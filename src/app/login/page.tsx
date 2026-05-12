@@ -39,14 +39,14 @@ export default function LoginPage() {
   }
 
   return (
-    <main className="grid min-h-screen place-items-center px-4 text-slate-900">
+    <main className="grid min-h-screen place-items-center px-4 text-slate-900 dark:text-slate-100">
       <form className="ui-glass grid w-full max-w-sm gap-4 p-8" onSubmit={signIn}>
         <div>
-          <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-blue-100 bg-blue-50 shadow-sm shadow-indigo-100/50">
-            <Lock className="h-4 w-4 text-blue-600" />
+          <div className="mb-4 flex h-10 w-10 items-center justify-center rounded-xl border border-blue-100 dark:border-blue-900/30 bg-blue-50 dark:bg-blue-950/30 shadow-sm shadow-indigo-100/50">
+            <Lock className="h-4 w-4 text-blue-600 dark:text-blue-400" />
           </div>
           <h1 className="text-xl font-semibold tracking-tight">Crypto2028 Portfolio</h1>
-          <p className="mt-2 text-sm text-slate-600">私有账户登录</p>
+          <p className="mt-2 text-sm text-slate-600 dark:text-slate-400">私有账户登录</p>
         </div>
         <input
           className="ui-input h-10 px-3 text-sm"
