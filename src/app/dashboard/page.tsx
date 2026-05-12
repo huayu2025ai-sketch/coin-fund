@@ -241,7 +241,7 @@ function DashboardInner() {
               <table className="w-full min-w-[640px] text-sm">
                 <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
                   <tr className="border-b border-slate-100 dark:border-slate-800">
-                    <th className="py-2.5 font-medium">资产</th>
+                    <th className="w-20 py-2.5 font-medium whitespace-nowrap">资产</th>
                     <th className="py-2.5 text-right font-medium">数量</th>
                     <th className="py-2.5 text-right font-medium">平均成本</th>
                     <th className="py-2.5 text-right font-medium">价格</th>
@@ -253,7 +253,7 @@ function DashboardInner() {
                 <tbody>
                   {positions.map((position) => (
                     <tr className="border-b border-slate-50 transition-colors hover:bg-slate-50/60 dark:border-slate-800/50 dark:hover:bg-slate-800/40" key={position.asset}>
-                      <td className="py-3 font-medium text-slate-900 dark:text-slate-100">
+                      <td className="w-20 py-3 font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
                         <span className="inline-flex items-center gap-2">
                           <AssetBadge asset={position.asset} />
                           {position.asset}
