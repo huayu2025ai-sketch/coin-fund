@@ -258,10 +258,10 @@ export function TransactionEntryForm() {
       </div>
 
       {/* 操作区 */}
-      <div className="grid gap-x-5 gap-y-4 border-t border-slate-100 pt-6 md:grid-cols-[180px_1fr_auto] md:items-end">
-        <Field label="日期">
+      <div className="grid gap-x-6 gap-y-5 border-t border-slate-100 pt-7 md:grid-cols-[200px_1fr_auto] md:items-end">
+        <Field label="成交日期">
           <input
-            className="ui-input h-11 w-full px-4 text-sm"
+            className="ui-input h-12 w-full px-4 text-sm"
             type="date"
             value={form.executedAt}
             onChange={(event) =>
@@ -271,7 +271,7 @@ export function TransactionEntryForm() {
         </Field>
         <Field label="备注（可选）">
           <input
-            className="ui-input h-11 w-full px-4 text-sm"
+            className="ui-input h-12 w-full px-4 text-sm"
             placeholder="补充说明..."
             value={form.note}
             onChange={(event) =>
@@ -280,12 +280,12 @@ export function TransactionEntryForm() {
           />
         </Field>
         <button
-          className="ui-btn-primary ui-interactive inline-flex h-11 items-center justify-center gap-2 px-6 text-sm font-medium disabled:opacity-50"
+          className="ui-btn-primary ui-interactive inline-flex h-12 items-center justify-center gap-2 rounded-xl px-8 text-sm font-semibold disabled:opacity-50"
           disabled={mutation.isPending}
           type="submit"
         >
           <Plus className="h-4 w-4" />
-          添加
+          添加记录
         </button>
       </div>
 

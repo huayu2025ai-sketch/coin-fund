@@ -4,15 +4,12 @@ import { useMemo } from "react";
 import { useQuery } from "@tanstack/react-query";
 import {
   Activity,
-  ArrowUpRight,
   Coins,
   Database,
   Flame,
   TrendingUp,
 } from "lucide-react";
 import {
-  Area,
-  AreaChart,
   Bar,
   BarChart,
   CartesianGrid,
@@ -113,42 +110,6 @@ function DashboardInner() {
   );
   const totals = useMemo(() => calculateTotals(positions), [positions]);
 
-  const todayLabel = useMemo(
-    () =>
-      new Date().toLocaleDateString("zh-CN", {
-        month: "short",
-        day: "numeric",
-      }),
-    [],
-  );
-
-  const timeline = useMemo(() => {
-    return [...transactions]
-      .sort(
-        (left, right) =>
-          new Date(left.executed_at).getTime() -
-          new Date(right.executed_at).getTime(),
-      )
-      .reduce<Array<{ date: string; cash: number; conversion: number; highlight: boolean }>>(
-        (rows, transaction) => {
-          const previous = rows.at(-1) ?? { cash: 0, conversion: 0 };
-          const date = new Date(transaction.executed_at).toLocaleDateString("zh-CN", {
-            month: "short",
-            day: "numeric",
-          });
-          rows.push({
-            date,
-            cash: previous.cash + transaction.cash_amount_usd,
-            conversion:
-              previous.conversion + transaction.conversion_value_usd,
-            highlight: date === todayLabel,
-          });
-          return rows;
-        },
-        [],
-      );
-  }, [todayLabel, transactions]);
-
   return (
     <main className="min-h-screen bg-[#F8FAFC] p-8">
       <div className="mx-auto grid w-full max-w-7xl gap-10 lg:grid-cols-[280px_1fr]">
@@ -221,7 +182,7 @@ function DashboardInner() {
             </div>
           </div>
 
-          <div className="grid gap-10 xl:grid-cols-[1.25fr_0.75fr]">
+          <div className="grid gap-10">
             <div className="ui-card ui-interactive p-8">
               <h2 className="mb-6 text-sm font-semibold ui-title">持仓明细</h2>
               <div className="overflow-x-auto">
@@ -267,62 +228,8 @@ function DashboardInner() {
               </div>
             </div>
 
-            <div className="grid gap-10">
-              <div className="ui-card ui-interactive p-8">
-                <div className="mb-6 flex items-center justify-between">
-                  <h2 className="text-sm font-semibold ui-title">资金来源</h2>
-                  <ArrowUpRight className="h-4 w-4 text-blue-500" />
-                </div>
-                <div className="h-[220px]">
-                  <ResponsiveContainer height="100%" width="100%">
-                    <AreaChart data={timeline}>
-                      <defs>
-                        <linearGradient id="cashFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#60a5fa" stopOpacity={0.25} />
-                          <stop offset="100%" stopColor="#60a5fa" stopOpacity={0} />
-                        </linearGradient>
-                        <linearGradient id="convFill" x1="0" y1="0" x2="0" y2="1">
-                          <stop offset="0%" stopColor="#a78bfa" stopOpacity={0.22} />
-                          <stop offset="100%" stopColor="#a78bfa" stopOpacity={0} />
-                        </linearGradient>
-                      </defs>
-                      <CartesianGrid stroke="#f8fafc" vertical={false} />
-                      <XAxis axisLine={false} dataKey="date" tick={{ fill: "#94a3b8", fontSize: 11 }} tickLine={false} />
-                      <YAxis axisLine={false} tick={{ fill: "#94a3b8", fontSize: 11 }} tickFormatter={(value) => compactUsd.format(value)} tickLine={false} />
-                      <Tooltip formatter={(value) => usd.format(Number(value))} />
-                      <Area dataKey="cash" fill="url(#cashFill)" stroke="#3b82f6" strokeWidth={2} type="monotone" />
-                      <Area dataKey="conversion" fill="url(#convFill)" stroke="#8b5cf6" strokeWidth={2} type="monotone" />
-                      <Area
-                        dataKey="cash"
-                        dot={(props: any) => {
-                          const { cx, cy, payload } = props;
-                          if (!payload?.highlight) {
-                            return <circle cx={cx} cy={cy} fill="transparent" r={0} />;
-                          }
-                          return (
-                            <circle
-                              cx={cx}
-                              cy={cy}
-                              fill="#2563eb"
-                              r={4}
-                              stroke="#ffffff"
-                              strokeWidth={2}
-                            />
-                          );
-                        }}
-                        fillOpacity={0}
-                        isAnimationActive={false}
-                        stroke="transparent"
-                        type="monotone"
-                      />
-                    </AreaChart>
-                  </ResponsiveContainer>
-                </div>
-              </div>
-
-              <div className="ui-card ui-interactive p-8">
-                <TransactionEntryForm />
-              </div>
+            <div className="ui-card ui-interactive p-8">
+              <TransactionEntryForm />
             </div>
           </div>
         </section>
