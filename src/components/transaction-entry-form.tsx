@@ -132,12 +132,13 @@ export function TransactionEntryForm() {
 
   return (
     <form
-      className="grid gap-6"
+      className="grid gap-8"
       onSubmit={(event) => {
         event.preventDefault();
         mutation.mutate();
       }}
     >
+      {/* Header */}
       <div className="flex items-center justify-between gap-3">
         <h2 className="text-sm font-semibold text-slate-900">新增交易</h2>
         <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-slate-200 bg-slate-50 p-1 text-xs">
@@ -158,91 +159,106 @@ export function TransactionEntryForm() {
         </div>
       </div>
 
-      <div className="grid gap-4 md:grid-cols-4">
-        <Field label="资产">
-          <select
-            className="ui-input h-11 w-full px-4 text-sm"
-            value={form.asset}
-            onChange={(event) =>
-              setForm((value) => ({ ...value, asset: event.target.value as Asset }))
-            }
-          >
-            {assets.map((asset) => (
-              <option key={asset}>{asset}</option>
-            ))}
-          </select>
-        </Field>
-        <Field label="数量">
-          <NumberInput
-            value={form.quantity}
-            onChange={(quantity) => setForm((value) => ({ ...value, quantity }))}
-          />
-        </Field>
-        <Field label="价格（USD）">
-          <NumberInput
-            value={form.priceUsd}
-            onChange={(priceUsd) => setForm((value) => ({ ...value, priceUsd }))}
-          />
-        </Field>
-        <Field label="手续费（USD）">
-          <NumberInput
-            value={form.feeUsd}
-            onChange={(feeUsd) => setForm((value) => ({ ...value, feeUsd }))}
-          />
-        </Field>
+      {/* 基础交易信息 */}
+      <div className="grid gap-5">
+        <div className="text-xs font-medium uppercase tracking-wider text-slate-400">
+          交易信息
+        </div>
+        <div className="grid gap-x-5 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
+          <Field label="资产">
+            <select
+              className="ui-input h-11 w-full px-4 text-sm"
+              value={form.asset}
+              onChange={(event) =>
+                setForm((value) => ({ ...value, asset: event.target.value as Asset }))
+              }
+            >
+              {assets.map((asset) => (
+                <option key={asset}>{asset}</option>
+              ))}
+            </select>
+          </Field>
+          <Field label="数量">
+            <NumberInput
+              value={form.quantity}
+              onChange={(quantity) => setForm((value) => ({ ...value, quantity }))}
+            />
+          </Field>
+          <Field label="价格（USD）">
+            <NumberInput
+              value={form.priceUsd}
+              onChange={(priceUsd) => setForm((value) => ({ ...value, priceUsd }))}
+            />
+          </Field>
+          <Field label="手续费（USD）">
+            <NumberInput
+              value={form.feeUsd}
+              onChange={(feeUsd) => setForm((value) => ({ ...value, feeUsd }))}
+            />
+          </Field>
+        </div>
       </div>
 
-      {form.kind === "DCA" ? (
-        <Field label="现金投入（USD）">
-          <NumberInput
-            value={form.cashAmountUsd}
-            onChange={(cashAmountUsd) =>
-              setForm((value) => ({ ...value, cashAmountUsd }))
-            }
-          />
-        </Field>
-      ) : (
-        <div className="grid gap-4 md:grid-cols-[1fr_1fr_1fr_auto] md:items-end">
-          <Field label="来源代币符号">
-            <input
-              className="ui-input h-11 w-full px-4 text-sm uppercase"
-              placeholder="ARB"
-              value={form.sourceAltcoinSymbol}
-              onChange={(event) =>
-                setForm((value) => ({
-                  ...value,
-                  sourceAltcoinSymbol: event.target.value,
-                }))
-              }
-            />
-          </Field>
-          <Field label="来源代币数量">
-            <NumberInput
-              value={form.sourceAltcoinQuantity}
-              onChange={(sourceAltcoinQuantity) =>
-                setForm((value) => ({ ...value, sourceAltcoinQuantity }))
-              }
-            />
-          </Field>
-          <Field label="来源代币成本（USD）">
-            <NumberInput
-              value={form.sourceAltcoinCostUsd}
-              onChange={(sourceAltcoinCostUsd) =>
-                setForm((value) => ({ ...value, sourceAltcoinCostUsd }))
-              }
-            />
-          </Field>
-          <div className="rounded-xl border border-slate-100 bg-slate-50 px-4 py-3 text-xs text-slate-500">
-            <div className="flex items-center gap-2">
-              <ArrowRight className="h-3.5 w-3.5" />
-              {conversionRate.toFixed(6)} 来源代币 / {form.asset}
-            </div>
-            <div className="mt-0.5 font-medium text-slate-700">${conversionValueUsd.toFixed(2)} 转换价值</div>
-          </div>
+      {/* 资金来源 —— 换仓/定投 */}
+      <div className="rounded-2xl border border-slate-100 bg-slate-50/40 p-5">
+        <div className="mb-4 text-xs font-medium uppercase tracking-wider text-slate-400">
+          {form.kind === "DCA" ? "现金投入" : "来源代币"}
         </div>
-      )}
+        {form.kind === "DCA" ? (
+          <Field label="现金投入（USD）">
+            <NumberInput
+              value={form.cashAmountUsd}
+              onChange={(cashAmountUsd) =>
+                setForm((value) => ({ ...value, cashAmountUsd }))
+              }
+            />
+          </Field>
+        ) : (
+          <div className="grid gap-x-5 gap-y-4 md:grid-cols-3">
+            <Field label="来源代币符号">
+              <input
+                className="ui-input h-11 w-full px-4 text-sm uppercase"
+                placeholder="ARB"
+                value={form.sourceAltcoinSymbol}
+                onChange={(event) =>
+                  setForm((value) => ({
+                    ...value,
+                    sourceAltcoinSymbol: event.target.value,
+                  }))
+                }
+              />
+            </Field>
+            <Field label="来源代币数量">
+              <NumberInput
+                value={form.sourceAltcoinQuantity}
+                onChange={(sourceAltcoinQuantity) =>
+                  setForm((value) => ({ ...value, sourceAltcoinQuantity }))
+                }
+              />
+            </Field>
+            <Field label="来源代币成本（USD）">
+              <NumberInput
+                value={form.sourceAltcoinCostUsd}
+                onChange={(sourceAltcoinCostUsd) =>
+                  setForm((value) => ({ ...value, sourceAltcoinCostUsd }))
+                }
+              />
+            </Field>
+          </div>
+        )}
 
-      <div className="grid gap-4 md:grid-cols-[180px_1fr_auto] md:items-end">
+        {form.kind === "CONVERSION" && (
+          <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-2.5 text-xs text-slate-500 shadow-sm">
+            <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
+            <span>兑换率 {conversionRate.toFixed(6)} 来源代币 / {form.asset}</span>
+            <span className="mx-1 text-slate-300">|</span>
+            <span className="font-medium text-slate-700">${conversionValueUsd.toFixed(2)} 转换价值</span>
+          </div>
+        )}
+      </div>
+
+      {/* 操作区 */}
+      <div className="grid gap-x-5 gap-y-4 border-t border-slate-100 pt-6 md:grid-cols-[180px_1fr_auto] md:items-end">
         <Field label="日期">
           <input
             className="ui-input h-11 w-full px-4 text-sm"
@@ -253,9 +269,10 @@ export function TransactionEntryForm() {
             }
           />
         </Field>
-        <Field label="备注">
+        <Field label="备注（可选）">
           <input
             className="ui-input h-11 w-full px-4 text-sm"
+            placeholder="补充说明..."
             value={form.note}
             onChange={(event) =>
               setForm((value) => ({ ...value, note: event.target.value }))
@@ -263,7 +280,7 @@ export function TransactionEntryForm() {
           />
         </Field>
         <button
-          className="ui-btn-primary ui-interactive inline-flex h-11 items-center justify-center gap-2 px-5 text-sm font-medium disabled:opacity-50"
+          className="ui-btn-primary ui-interactive inline-flex h-11 items-center justify-center gap-2 px-6 text-sm font-medium disabled:opacity-50"
           disabled={mutation.isPending}
           type="submit"
         >
@@ -272,8 +289,11 @@ export function TransactionEntryForm() {
         </button>
       </div>
 
+      {/* 错误提示 */}
       {mutation.error ? (
-        <p className="text-sm text-red-600">{mutation.error.message}</p>
+        <div className="rounded-xl border border-red-100 bg-red-50 px-4 py-3 text-sm text-red-600">
+          {mutation.error.message}
+        </div>
       ) : null}
     </form>
   );
@@ -287,8 +307,8 @@ function Field({
   label: string;
 }) {
   return (
-    <label className="ui-label grid gap-2">
-      {label}
+    <label className="flex flex-col gap-2.5">
+      <span className="text-xs font-medium text-slate-500">{label}</span>
       {children}
     </label>
   );
