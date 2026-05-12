@@ -1,7 +1,9 @@
 "use client";
 
 import { createClient } from "@supabase/supabase-js";
-import type { Asset, TransactionKind } from "./portfolio";
+import type { Asset } from "./portfolio";
+
+type TransactionKind = "DCA" | "CONVERSION";
 
 type PortfolioTransactionInsert = {
   user_id: string;

@@ -1,12 +1,13 @@
 "use client";
 
 import { useMemo } from "react";
-import { useQuery } from "@tanstack/react-query";
+import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
   Coins,
   Database,
   Flame,
+  Trash2,
 } from "lucide-react";
 import {
   Bar,
@@ -109,6 +110,21 @@ function DashboardInner() {
     [prices, transactions],
   );
   const totals = useMemo(() => calculateTotals(positions), [positions]);
+
+  const queryClient = useQueryClient();
+  const deleteMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const supabase = getSupabaseClient();
+      const { error } = await supabase
+        .from("portfolio_transactions")
+        .delete()
+        .eq("id", id);
+      if (error) throw error;
+    },
+    onSuccess: async () => {
+      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+    },
+  });
 
   return (
     <main className="min-h-screen bg-[#F8FAFC] p-6 lg:p-10 dark:bg-[#0b1120]">
@@ -266,6 +282,86 @@ function DashboardInner() {
         {/* ── 新增交易 ── */}
         <div className="ui-card ui-interactive p-6 lg:p-8">
           <TransactionEntryForm />
+        </div>
+
+        {/* ── 交易记录 ── */}
+        <div className="ui-card ui-interactive p-6 lg:p-8">
+          <div className="mb-5 flex items-center justify-between">
+            <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">交易记录</h2>
+            <span className="text-xs text-slate-400 dark:text-slate-500">
+              共 {transactions.length} 条
+            </span>
+          </div>
+
+          {transactions.length === 0 ? (
+            <div className="py-8 text-center text-sm text-slate-400 dark:text-slate-500">
+              暂无交易记录，请在上方添加。
+            </div>
+          ) : (
+            <div className="overflow-x-auto">
+              <table className="w-full min-w-[720px] text-sm">
+                <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                  <tr className="border-b border-slate-100 dark:border-slate-800">
+                    <th className="py-2.5 font-medium">日期</th>
+                    <th className="py-2.5 font-medium">资产</th>
+                    <th className="py-2.5 text-right font-medium">数量</th>
+                    <th className="py-2.5 text-right font-medium">价格</th>
+                    <th className="py-2.5 text-right font-medium">手续费</th>
+                    <th className="py-2.5 text-right font-medium">现金投入</th>
+                    <th className="py-2.5 font-medium">备注</th>
+                    <th className="py-2.5 text-right font-medium">操作</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {transactions.map((tx) => (
+                    <tr
+                      className="border-b border-slate-50 transition-colors hover:bg-slate-50/60 dark:border-slate-800/50 dark:hover:bg-slate-800/40"
+                      key={tx.id}
+                    >
+                      <td className="py-3 text-slate-600 dark:text-slate-400">
+                        {new Date(tx.executed_at).toLocaleDateString("zh-CN")}
+                      </td>
+                      <td className="py-3 font-medium text-slate-900 dark:text-slate-100">
+                        <span className="inline-flex items-center gap-2">
+                          <AssetBadge asset={tx.asset} />
+                          {tx.asset}
+                        </span>
+                      </td>
+                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                        {tx.quantity.toFixed(8)}
+                      </td>
+                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                        {usd.format(tx.price_usd)}
+                      </td>
+                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                        {usd.format(tx.fee_usd)}
+                      </td>
+                      <td className="py-3 text-right font-medium text-slate-900 dark:text-slate-100">
+                        {usd.format(tx.cash_amount_usd)}
+                      </td>
+                      <td className="py-3 text-slate-500 dark:text-slate-400">
+                        {tx.note || "—"}
+                      </td>
+                      <td className="py-3 text-right">
+                        <button
+                          className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-950/30 dark:hover:text-red-400"
+                          disabled={deleteMutation.isPending}
+                          title="删除"
+                          onClick={() => {
+                            if (confirm("确定删除这条交易记录？")) {
+                              deleteMutation.mutate(tx.id);
+                            }
+                          }}
+                        >
+                          <Trash2 className="h-3.5 w-3.5" />
+                        </button>
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            </div>
+          )}
         </div>
       </div>
     </main>

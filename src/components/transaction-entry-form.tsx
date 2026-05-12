@@ -1,37 +1,29 @@
 "use client";
 
-import { useMemo, useState, type ReactNode } from "react";
+import { useState, type ReactNode } from "react";
 import { useMutation, useQueryClient } from "@tanstack/react-query";
-import { ArrowRight, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabase-client";
-import type { Asset, TransactionKind } from "@/lib/portfolio";
+import type { Asset } from "@/lib/portfolio";
 
 const assets: Asset[] = ["BTC", "ETH", "SOL"];
 
 type FormState = {
-  kind: TransactionKind;
   asset: Asset;
   quantity: string;
   priceUsd: string;
   feeUsd: string;
   cashAmountUsd: string;
-  sourceAltcoinSymbol: string;
-  sourceAltcoinQuantity: string;
-  sourceAltcoinCostUsd: string;
   executedAt: string;
   note: string;
 };
 
 const initialState: FormState = {
-  kind: "DCA",
   asset: "BTC",
   quantity: "",
   priceUsd: "",
   feeUsd: "0",
   cashAmountUsd: "",
-  sourceAltcoinSymbol: "",
-  sourceAltcoinQuantity: "",
-  sourceAltcoinCostUsd: "",
   executedAt: new Date().toISOString().slice(0, 10),
   note: "",
 };
@@ -39,19 +31,6 @@ const initialState: FormState = {
 export function TransactionEntryForm() {
   const queryClient = useQueryClient();
   const [form, setForm] = useState<FormState>(initialState);
-
-  const conversionValueUsd = useMemo(() => {
-    return numberOrZero(form.quantity) * numberOrZero(form.priceUsd);
-  }, [form.priceUsd, form.quantity]);
-
-  const conversionRate = useMemo(() => {
-    const sourceQuantity = numberOrZero(form.sourceAltcoinQuantity);
-    const targetQuantity = numberOrZero(form.quantity);
-
-    return sourceQuantity > 0 && targetQuantity > 0
-      ? sourceQuantity / targetQuantity
-      : 0;
-  }, [form.quantity, form.sourceAltcoinQuantity]);
 
   const mutation = useMutation({
     mutationFn: async () => {
@@ -68,50 +47,27 @@ export function TransactionEntryForm() {
       const priceUsd = numberOrZero(form.priceUsd);
       const feeUsd = numberOrZero(form.feeUsd);
       const cashAmountUsd = numberOrZero(form.cashAmountUsd);
-      const sourceAltcoinQuantity = numberOrZero(form.sourceAltcoinQuantity);
 
       if (quantity <= 0) {
         throw new Error("数量必须大于 0。");
       }
 
-      if (form.kind === "DCA" && cashAmountUsd <= 0) {
-        throw new Error("定投模式下，现金投入必须大于 0。");
-      }
-
-      if (form.kind === "CONVERSION") {
-        if (!form.sourceAltcoinSymbol.trim()) {
-          throw new Error("换仓模式下，来源代币符号不能为空。");
-        }
-        if (sourceAltcoinQuantity <= 0) {
-          throw new Error("换仓模式下，来源代币数量必须大于 0。");
-        }
-        if (conversionValueUsd <= 0) {
-          throw new Error("换仓模式下，转换价值必须大于 0。");
-        }
+      if (cashAmountUsd <= 0) {
+        throw new Error("现金投入必须大于 0。");
       }
 
       const payload = {
         user_id: user.id,
-        kind: form.kind,
+        kind: "DCA" as const,
         asset: form.asset,
         quantity,
         price_usd: priceUsd,
         fee_usd: feeUsd,
-        cash_amount_usd: form.kind === "DCA" ? cashAmountUsd : 0,
-        conversion_value_usd:
-          form.kind === "CONVERSION" ? conversionValueUsd : 0,
-        source_altcoin_symbol:
-          form.kind === "CONVERSION"
-            ? form.sourceAltcoinSymbol.trim().toUpperCase()
-            : null,
-        source_altcoin_quantity:
-          form.kind === "CONVERSION"
-            ? sourceAltcoinQuantity
-            : null,
-        source_altcoin_cost_usd:
-          form.kind === "CONVERSION" && form.sourceAltcoinCostUsd
-            ? numberOrZero(form.sourceAltcoinCostUsd)
-            : null,
+        cash_amount_usd: cashAmountUsd,
+        conversion_value_usd: 0,
+        source_altcoin_symbol: null,
+        source_altcoin_quantity: null,
+        source_altcoin_cost_usd: null,
         executed_at: new Date(form.executedAt).toISOString(),
         note: form.note.trim() || null,
       };
@@ -140,28 +96,14 @@ export function TransactionEntryForm() {
     >
       {/* Header */}
       <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">新增交易</h2>
-        <div className="grid grid-cols-2 overflow-hidden rounded-xl border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900/50 p-1 text-xs">
-          {(["DCA", "CONVERSION"] as TransactionKind[]).map((kind) => (
-            <button
-              className={
-                form.kind === kind
-                  ? "rounded-lg bg-white dark:bg-[#1e293b] px-4 py-2 font-medium text-slate-900 dark:text-slate-100 shadow-sm transition-all duration-200 ease-out"
-                  : "rounded-lg px-4 py-2 font-medium text-slate-500 dark:text-slate-400 transition-all duration-200 ease-out hover:text-slate-700 dark:text-slate-300"
-              }
-              key={kind}
-              type="button"
-              onClick={() => setForm((value) => ({ ...value, kind }))}
-            >
-              {kind === "DCA" ? "定投" : "换仓"}
-            </button>
-          ))}
-        </div>
+        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
+          新增定投记录
+        </h2>
       </div>
 
-      {/* 基础交易信息 */}
+      {/* 交易信息 */}
       <div className="grid gap-5">
-        <div className="text-xs font-medium uppercase tracking-wider text-slate-400">
+        <div className="text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
           交易信息
         </div>
         <div className="grid gap-x-5 gap-y-4 md:grid-cols-2 xl:grid-cols-4">
@@ -199,70 +141,16 @@ export function TransactionEntryForm() {
         </div>
       </div>
 
-      {/* 来源代币 —— 仅换仓模式 */}
-      {form.kind === "CONVERSION" && (
-        <div className="rounded-2xl border border-slate-100 dark:border-slate-800 bg-slate-50 dark:bg-slate-900/50/40 p-5">
-          <div className="mb-4 text-xs font-medium uppercase tracking-wider text-slate-400">
-            来源代币
-          </div>
-          <div className="grid gap-x-5 gap-y-4 md:grid-cols-3">
-            <Field label="来源代币符号">
-              <input
-                className="ui-input h-11 w-full px-4 text-sm uppercase"
-                placeholder="ARB"
-                value={form.sourceAltcoinSymbol}
-                onChange={(event) =>
-                  setForm((value) => ({
-                    ...value,
-                    sourceAltcoinSymbol: event.target.value,
-                  }))
-                }
-              />
-            </Field>
-            <Field label="来源代币数量">
-              <NumberInput
-                value={form.sourceAltcoinQuantity}
-                onChange={(sourceAltcoinQuantity) =>
-                  setForm((value) => ({ ...value, sourceAltcoinQuantity }))
-                }
-              />
-            </Field>
-            <Field label="来源代币成本（USD）">
-              <NumberInput
-                value={form.sourceAltcoinCostUsd}
-                onChange={(sourceAltcoinCostUsd) =>
-                  setForm((value) => ({ ...value, sourceAltcoinCostUsd }))
-                }
-              />
-            </Field>
-          </div>
-          <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-100 dark:border-slate-800 bg-white dark:bg-[#1e293b] px-4 py-2.5 text-xs text-slate-500 dark:text-slate-400 shadow-sm">
-            <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
-            <span>兑换率 {conversionRate.toFixed(6)} 来源代币 / {form.asset}</span>
-            <span className="mx-1 text-slate-300">|</span>
-            <span className="font-medium text-slate-700 dark:text-slate-300">${conversionValueUsd.toFixed(2)} 转换价值</span>
-          </div>
-        </div>
-      )}
-
       {/* 操作区 */}
-      <div
-        className={
-          form.kind === "DCA"
-            ? "grid gap-x-5 gap-y-4 border-t border-slate-100 dark:border-slate-800 pt-7 md:grid-cols-[160px_180px_1fr_auto] md:items-end"
-            : "grid gap-x-5 gap-y-4 border-t border-slate-100 dark:border-slate-800 pt-7 md:grid-cols-[180px_1fr_auto] md:items-end"
-        }
-      >
-        {form.kind === "DCA" && (
-          <Field label="现金投入（USD）">
-            <NumberInput
-              value={form.cashAmountUsd}
-              onChange={(cashAmountUsd) =>
-                setForm((value) => ({ ...value, cashAmountUsd }))
-              }
-            />
-          </Field>
-        )}
+      <div className="grid gap-x-5 gap-y-4 border-t border-slate-100 dark:border-slate-800 pt-7 md:grid-cols-[160px_180px_1fr_auto] md:items-end">
+        <Field label="现金投入（USD）">
+          <NumberInput
+            value={form.cashAmountUsd}
+            onChange={(cashAmountUsd) =>
+              setForm((value) => ({ ...value, cashAmountUsd }))
+            }
+          />
+        </Field>
         <Field label="成交日期">
           <input
             className="ui-input h-12 w-full px-4 text-sm"
