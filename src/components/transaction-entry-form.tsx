@@ -199,21 +199,12 @@ export function TransactionEntryForm() {
         </div>
       </div>
 
-      {/* 资金来源 —— 换仓/定投 */}
-      <div className="rounded-2xl border border-slate-100 bg-slate-50/40 p-5">
-        <div className="mb-4 text-xs font-medium uppercase tracking-wider text-slate-400">
-          {form.kind === "DCA" ? "现金投入" : "来源代币"}
-        </div>
-        {form.kind === "DCA" ? (
-          <Field label="现金投入（USD）">
-            <NumberInput
-              value={form.cashAmountUsd}
-              onChange={(cashAmountUsd) =>
-                setForm((value) => ({ ...value, cashAmountUsd }))
-              }
-            />
-          </Field>
-        ) : (
+      {/* 来源代币 —— 仅换仓模式 */}
+      {form.kind === "CONVERSION" && (
+        <div className="rounded-2xl border border-slate-100 bg-slate-50/40 p-5">
+          <div className="mb-4 text-xs font-medium uppercase tracking-wider text-slate-400">
+            来源代币
+          </div>
           <div className="grid gap-x-5 gap-y-4 md:grid-cols-3">
             <Field label="来源代币符号">
               <input
@@ -245,20 +236,33 @@ export function TransactionEntryForm() {
               />
             </Field>
           </div>
-        )}
-
-        {form.kind === "CONVERSION" && (
           <div className="mt-4 inline-flex items-center gap-2 rounded-xl border border-slate-100 bg-white px-4 py-2.5 text-xs text-slate-500 shadow-sm">
             <ArrowRight className="h-3.5 w-3.5 text-slate-400" />
             <span>兑换率 {conversionRate.toFixed(6)} 来源代币 / {form.asset}</span>
             <span className="mx-1 text-slate-300">|</span>
             <span className="font-medium text-slate-700">${conversionValueUsd.toFixed(2)} 转换价值</span>
           </div>
-        )}
-      </div>
+        </div>
+      )}
 
       {/* 操作区 */}
-      <div className="grid gap-x-6 gap-y-5 border-t border-slate-100 pt-7 md:grid-cols-[200px_1fr_auto] md:items-end">
+      <div
+        className={
+          form.kind === "DCA"
+            ? "grid gap-x-5 gap-y-4 border-t border-slate-100 pt-7 md:grid-cols-[160px_180px_1fr_auto] md:items-end"
+            : "grid gap-x-5 gap-y-4 border-t border-slate-100 pt-7 md:grid-cols-[180px_1fr_auto] md:items-end"
+        }
+      >
+        {form.kind === "DCA" && (
+          <Field label="现金投入（USD）">
+            <NumberInput
+              value={form.cashAmountUsd}
+              onChange={(cashAmountUsd) =>
+                setForm((value) => ({ ...value, cashAmountUsd }))
+              }
+            />
+          </Field>
+        )}
         <Field label="成交日期">
           <input
             className="ui-input h-12 w-full px-4 text-sm"
