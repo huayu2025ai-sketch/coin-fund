@@ -94,13 +94,6 @@ export function TransactionEntryForm() {
         mutation.mutate();
       }}
     >
-      {/* Header */}
-      <div className="flex items-center justify-between gap-3">
-        <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">
-          新增定投记录
-        </h2>
-      </div>
-
       {/* 交易信息 */}
       <div className="grid gap-5">
         <div className="text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
