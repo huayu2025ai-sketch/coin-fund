@@ -1,5 +1,5 @@
 #!/usr/bin/env bash
-set -uo pipefail
+set -eo pipefail
 
 APP_NAME="fund-web"
 PID_FILE=".run.pid"
@@ -12,9 +12,10 @@ is_running() {
   fi
 
   local pid
-  pid="$(cat "$PID_FILE")"
+  pid="$(cat "$PID_FILE" 2>/dev/null || true)"
 
   if [[ -z "$pid" ]]; then
+    rm -f "$PID_FILE"
     return 1
   fi
 
@@ -27,22 +28,22 @@ is_running() {
 }
 
 start() {
+  local pid
+
   if is_running; then
     echo "$APP_NAME 已在运行（PID: $(cat "$PID_FILE")）。"
     return 0
   fi
 
-  # 追加日志并添加时间戳分割线，避免覆盖历史日志
   {
     echo ""
     echo "=== $(date '+%Y-%m-%d %H:%M:%S') 启动 $APP_NAME ==="
   } >> "$LOG_FILE"
 
-  # 使用 exec 替换 shell 进程，确保 $! 直接追踪到 npm 而非 bash wrapper
-  # 解决原脚本 kill bash 后 next dev 子进程成为孤儿、端口被占用的问题
-  nohup bash -lc 'exec npm run dev' >> "$LOG_FILE" 2>&1 &
-  local pid=$!
+  nohup bash -lc "exec $START_CMD" >> "$LOG_FILE" 2>&1 &
+  pid=$!
   echo "$pid" > "$PID_FILE"
+
   sleep 2
 
   if kill -0 "$pid" >/dev/null 2>&1; then
@@ -56,21 +57,17 @@ start() {
 }
 
 stop() {
+  local pid
+
   if ! is_running; then
     echo "$APP_NAME 未运行。"
     rm -f "$PID_FILE"
     return 0
   fi
 
-  local pid
   pid="$(cat "$PID_FILE")"
 
-  # 先尝试向整个进程组发送 SIGTERM（负号表示进程组）
-  if kill -TERM -"$pid" >/dev/null 2>&1; then
-    :
-  else
-    kill -TERM "$pid" >/dev/null 2>&1 || true
-  fi
+  kill -TERM "$pid" >/dev/null 2>&1 || true
 
   for _ in {1..10}; do
     if ! kill -0 "$pid" >/dev/null 2>&1; then
@@ -81,13 +78,8 @@ stop() {
     sleep 1
   done
 
-  # 强制终止进程组
   echo "$APP_NAME 未能优雅停止，正在强制结束。"
-  kill -9 -"$pid" >/dev/null 2>&1 || kill -9 "$pid" >/dev/null 2>&1 || true
-
-  # 兜底：清理可能残留的 next dev 进程，防止端口占用
-  pkill -f "next dev" >/dev/null 2>&1 || true
-
+  kill -9 "$pid" >/dev/null 2>&1 || true
   rm -f "$PID_FILE"
   echo "$APP_NAME 已停止。"
 }
@@ -101,22 +93,13 @@ status() {
   fi
 }
 
-logs() {
-  if [[ -f "$LOG_FILE" ]]; then
-    tail -f "$LOG_FILE"
-  else
-    echo "日志文件不存在：$LOG_FILE"
-    return 1
-  fi
-}
-
 restart() {
   stop
   start
 }
 
 usage() {
-  echo "用法：$0 {start|stop|restart|status|logs}"
+  echo "用法：$0 {start|stop|restart|status}"
 }
 
 case "${1:-}" in
@@ -131,9 +114,6 @@ case "${1:-}" in
     ;;
   status)
     status
-    ;;
-  logs)
-    logs
     ;;
   *)
     usage
