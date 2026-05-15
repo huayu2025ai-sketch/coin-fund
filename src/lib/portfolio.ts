@@ -1,4 +1,4 @@
-export type Asset = "BTC" | "ETH" | "SOL";
+export type Asset = "BTC" | "ETH" | "SOL" | "ATOM";
 
 export type PortfolioTransaction = {
   id: string;
@@ -38,7 +38,7 @@ export function calculatePositions(
     ]);
   }
 
-  return (["BTC", "ETH", "SOL"] as Asset[]).map((asset) => {
+  return (["BTC", "ETH", "SOL", "ATOM"] as Asset[]).map((asset) => {
     const rows = grouped.get(asset) ?? [];
     const quantity = sum(rows, (row) => row.quantity);
     const costBasisUsd = sum(rows, (row) => row.quantity * row.price_usd + row.fee_usd);

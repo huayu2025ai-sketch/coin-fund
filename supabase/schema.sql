@@ -1,7 +1,7 @@
 create extension if not exists pgcrypto;
 
 do $$ begin
-  create type public.crypto_asset as enum ('BTC', 'ETH', 'SOL');
+  create type public.crypto_asset as enum ('BTC', 'ETH', 'SOL', 'ATOM');
 exception
   when duplicate_object then null;
 end $$;

@@ -8,6 +8,7 @@ import {
   Coins,
   Database,
   Flame,
+  Orbit,
   Trash2,
 } from "lucide-react";
 import {
@@ -110,6 +111,7 @@ function DashboardInner() {
         BTC: 0,
         ETH: 0,
         SOL: 0,
+        ATOM: 0,
         stale: true,
         updatedAt: new Date(0).toISOString(),
       },
@@ -167,6 +169,8 @@ function DashboardInner() {
               <PricePill icon={Flame} label="ETH" value={usd.format(prices.ETH)} />
               <div className="h-3 w-px bg-slate-200 dark:bg-slate-700" />
               <PricePill icon={Database} label="SOL" value={usd.format(prices.SOL)} />
+              <div className="h-3 w-px bg-slate-200 dark:bg-slate-700" />
+              <PricePill icon={Orbit} label="ATOM" value={usd.format(prices.ATOM)} />
             </div>
 
             {/* 状态 */}
@@ -429,6 +433,8 @@ function AssetBadge({ asset }: { asset: Asset }) {
       ? "bg-amber-50 text-amber-700 border-amber-100 dark:bg-amber-950/30 dark:text-amber-400 dark:border-amber-900/30"
       : asset === "ETH"
         ? "bg-indigo-50 text-indigo-700 border-indigo-100 dark:bg-indigo-950/30 dark:text-indigo-400 dark:border-indigo-900/30"
+        : asset === "ATOM"
+          ? "bg-cyan-50 text-cyan-700 border-cyan-100 dark:bg-cyan-950/30 dark:text-cyan-400 dark:border-cyan-900/30"
         : "bg-emerald-50 text-emerald-700 border-emerald-100 dark:bg-emerald-950/30 dark:text-emerald-400 dark:border-emerald-900/30";
 
   return (

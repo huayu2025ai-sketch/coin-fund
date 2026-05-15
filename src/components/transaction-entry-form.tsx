@@ -6,7 +6,7 @@ import { Plus } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabase-client";
 import type { Asset } from "@/lib/portfolio";
 
-const assets: Asset[] = ["BTC", "ETH", "SOL"];
+const assets: Asset[] = ["BTC", "ETH", "SOL", "ATOM"];
 
 type FormState = {
   asset: Asset;

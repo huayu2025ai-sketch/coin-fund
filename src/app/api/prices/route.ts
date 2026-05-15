@@ -4,7 +4,7 @@ export const dynamic = "force-dynamic";
 export const revalidate = 0;
 
 const COINGECKO_URL =
-  "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana&vs_currencies=usd";
+  "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin,ethereum,solana,cosmos&vs_currencies=usd";
 
 export async function GET() {
   try {
@@ -22,6 +22,7 @@ export async function GET() {
       BTC: data.bitcoin.usd,
       ETH: data.ethereum.usd,
       SOL: data.solana.usd,
+      ATOM: data.cosmos.usd,
       stale: false,
       updatedAt: new Date().toISOString(),
     });
@@ -35,6 +36,7 @@ function fallbackPrices() {
     BTC: 0,
     ETH: 0,
     SOL: 0,
+    ATOM: 0,
     stale: true,
     updatedAt: new Date().toISOString(),
   });
