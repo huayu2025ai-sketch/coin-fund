@@ -2,11 +2,13 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useQueryClient } from "@tanstack/react-query";
 import { UserRoundCog } from "lucide-react";
 import { getSupabaseClient } from "@/lib/supabase-client";
 
 export function SwitchUserButton() {
   const router = useRouter();
+  const queryClient = useQueryClient();
   const [pending, setPending] = useState(false);
 
   async function onSwitchUser() {
@@ -17,6 +19,7 @@ export function SwitchUserButton() {
     try {
       const supabase = getSupabaseClient();
       await supabase.auth.signOut({ scope: "global" });
+      queryClient.clear();
     } finally {
       router.replace("/login");
       router.refresh();

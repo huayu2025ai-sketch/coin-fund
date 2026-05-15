@@ -64,6 +64,14 @@ async function fetchPrices() {
   return response.json() as Promise<PricesResponse>;
 }
 
+async function fetchCurrentUserId() {
+  const supabase = getSupabaseClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  return user?.id ?? null;
+}
+
 export default function DashboardPage() {
   return (
     <AuthGate>
@@ -75,9 +83,16 @@ export default function DashboardPage() {
 function DashboardInner() {
   const [createCollapsed, setCreateCollapsed] = useState(true);
   const [queryCollapsed, setQueryCollapsed] = useState(true);
+  const userQuery = useQuery({
+    queryKey: ["auth-user"],
+    queryFn: fetchCurrentUserId,
+  });
+  const currentUserId = userQuery.data ?? null;
+
   const transactionsQuery = useQuery({
-    queryKey: ["transactions"],
+    queryKey: ["transactions", currentUserId],
     queryFn: fetchTransactions,
+    enabled: Boolean(currentUserId),
   });
   const pricesQuery = useQuery({
     queryKey: ["prices"],
@@ -126,7 +141,7 @@ function DashboardInner() {
       if (error) throw error;
     },
     onSuccess: async () => {
-      await queryClient.invalidateQueries({ queryKey: ["transactions"] });
+      await queryClient.invalidateQueries({ queryKey: ["transactions", currentUserId] });
     },
   });
 
