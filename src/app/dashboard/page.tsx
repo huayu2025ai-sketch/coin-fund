@@ -33,6 +33,7 @@ import {
 } from "@/lib/portfolio";
 import { getSupabaseClient } from "@/lib/supabase-client";
 import { ThemeToggle } from "@/components/theme-toggle";
+import { SwitchUserButton } from "@/components/switch-user-button";
 
 type PricesResponse = PriceMap & {
   stale: boolean;
@@ -169,6 +170,7 @@ function DashboardInner() {
             </div>
 
             <ThemeToggle />
+            <SwitchUserButton />
           </div>
         </header>
 
