@@ -6,6 +6,8 @@ exception
   when duplicate_object then null;
 end $$;
 
+alter type public.crypto_asset add value if not exists 'ATOM';
+
 do $$ begin
   create type public.transaction_kind as enum ('DCA', 'CONVERSION');
 exception
