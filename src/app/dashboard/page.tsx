@@ -1,9 +1,10 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
+  ChevronDown,
   Coins,
   Database,
   Flame,
@@ -71,6 +72,8 @@ export default function DashboardPage() {
 }
 
 function DashboardInner() {
+  const [createCollapsed, setCreateCollapsed] = useState(true);
+  const [queryCollapsed, setQueryCollapsed] = useState(true);
   const transactionsQuery = useQuery({
     queryKey: ["transactions"],
     queryFn: fetchTransactions,
@@ -281,19 +284,36 @@ function DashboardInner() {
 
         {/* ── 新增交易 ── */}
         <div className="ui-card ui-interactive p-6 lg:p-8">
-          <TransactionEntryForm />
+          <button
+            className="flex w-full items-center justify-between text-left"
+            onClick={() => setCreateCollapsed((value) => !value)}
+            type="button"
+          >
+            <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">新增交易</h2>
+            <ChevronDown
+              className={`h-4 w-4 text-slate-400 transition-transform duration-150 ease-out dark:text-slate-500 ${createCollapsed ? "" : "rotate-180"}`}
+            />
+          </button>
+          {!createCollapsed ? <TransactionEntryForm /> : null}
         </div>
 
         {/* ── 交易记录 ── */}
         <div className="ui-card ui-interactive p-6 lg:p-8">
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">交易记录</h2>
-            <span className="text-xs text-slate-400 dark:text-slate-500">
-              共 {transactions.length} 条
-            </span>
-          </div>
+          <button
+            className="mb-5 flex w-full items-center justify-between text-left"
+            onClick={() => setQueryCollapsed((value) => !value)}
+            type="button"
+          >
+            <div className="flex items-center gap-2">
+              <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">交易记录</h2>
+              <span className="text-xs text-slate-400 dark:text-slate-500">共 {transactions.length} 条</span>
+            </div>
+            <ChevronDown
+              className={`h-4 w-4 text-slate-400 transition-transform duration-150 ease-out dark:text-slate-500 ${queryCollapsed ? "" : "rotate-180"}`}
+            />
+          </button>
 
-          {transactions.length === 0 ? (
+          {queryCollapsed ? null : transactions.length === 0 ? (
             <div className="py-8 text-center text-sm text-slate-400 dark:text-slate-500">
               暂无交易记录，请在上方添加。
             </div>
