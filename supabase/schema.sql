@@ -19,10 +19,10 @@ create table if not exists public.portfolio_transactions (
   user_id uuid not null references auth.users(id) on delete cascade,
   kind public.transaction_kind not null,
   asset public.crypto_asset not null,
-  quantity numeric(28, 12) not null check (quantity > 0),
+  quantity numeric(28, 12) not null check (quantity <> 0),
   price_usd numeric(28, 8) not null check (price_usd >= 0),
   fee_usd numeric(28, 8) not null default 0 check (fee_usd >= 0),
-  cash_amount_usd numeric(28, 8) not null default 0 check (cash_amount_usd >= 0),
+  cash_amount_usd numeric(28, 8) not null default 0,
   conversion_value_usd numeric(28, 8) not null default 0 check (conversion_value_usd >= 0),
   source_altcoin_symbol text,
   source_altcoin_quantity numeric(28, 12),
@@ -32,7 +32,13 @@ create table if not exists public.portfolio_transactions (
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now(),
   constraint dca_requires_cash check (
-    kind <> 'DCA' or (cash_amount_usd > 0 and conversion_value_usd = 0 and source_altcoin_symbol is null)
+    kind <> 'DCA' or (
+      cash_amount_usd <> 0
+      and quantity <> 0
+      and quantity * cash_amount_usd > 0
+      and conversion_value_usd = 0
+      and source_altcoin_symbol is null
+    )
   ),
   constraint conversion_requires_source check (
     kind <> 'CONVERSION' or (
@@ -44,6 +50,23 @@ create table if not exists public.portfolio_transactions (
     )
   )
 );
+
+alter table public.portfolio_transactions
+  drop constraint if exists portfolio_transactions_quantity_check,
+  drop constraint if exists portfolio_transactions_cash_amount_usd_check,
+  drop constraint if exists dca_requires_cash;
+
+alter table public.portfolio_transactions
+  add constraint portfolio_transactions_quantity_check check (quantity <> 0),
+  add constraint dca_requires_cash check (
+    kind <> 'DCA' or (
+      cash_amount_usd <> 0
+      and quantity <> 0
+      and quantity * cash_amount_usd > 0
+      and conversion_value_usd = 0
+      and source_altcoin_symbol is null
+    )
+  );
 
 create index if not exists portfolio_transactions_user_asset_idx
   on public.portfolio_transactions (user_id, asset, executed_at desc);

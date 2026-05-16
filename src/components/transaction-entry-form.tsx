@@ -48,12 +48,16 @@ export function TransactionEntryForm() {
       const feeUsd = numberOrZero(form.feeUsd);
       const cashAmountUsd = numberOrZero(form.cashAmountUsd);
 
-      if (quantity <= 0) {
-        throw new Error("数量必须大于 0。");
+      if (quantity === 0) {
+        throw new Error("数量不能为 0。买入填正数，卖出填负数。");
       }
 
-      if (cashAmountUsd <= 0) {
-        throw new Error("现金投入必须大于 0。");
+      if (cashAmountUsd === 0) {
+        throw new Error("现金投入不能为 0。买入填正数，卖出填负数。");
+      }
+
+      if ((quantity > 0 && cashAmountUsd < 0) || (quantity < 0 && cashAmountUsd > 0)) {
+        throw new Error("数量与现金投入需要同号：买入都为正，卖出都为负。");
       }
 
       const payload = {
@@ -115,6 +119,7 @@ export function TransactionEntryForm() {
           </Field>
           <Field label="数量">
             <NumberInput
+              allowNegative
               value={form.quantity}
               onChange={(quantity) => setForm((value) => ({ ...value, quantity }))}
             />
@@ -138,6 +143,7 @@ export function TransactionEntryForm() {
       <div className="grid gap-x-4 gap-y-4 border-t border-slate-100 dark:border-slate-800 pt-7 sm:grid-cols-2 md:grid-cols-[160px_180px_1fr_auto] md:items-end">
         <Field label="现金投入（USD）">
           <NumberInput
+            allowNegative
             value={form.cashAmountUsd}
             onChange={(cashAmountUsd) =>
               setForm((value) => ({ ...value, cashAmountUsd }))
@@ -174,6 +180,10 @@ export function TransactionEntryForm() {
         </button>
       </div>
 
+      <p className="text-xs text-slate-500 dark:text-slate-400">
+        卖出请填写负数数量与负数现金投入，例如：数量 -0.1，现金投入 -300。
+      </p>
+
       {/* 错误提示 */}
       {mutation.error ? (
         <div className="rounded-xl border border-red-100 dark:border-red-900/30 bg-red-50 dark:bg-red-950/30 px-4 py-3 text-sm text-red-600 dark:text-red-400">
@@ -200,9 +210,11 @@ function Field({
 }
 
 function NumberInput({
+  allowNegative = false,
   onChange,
   value,
 }: {
+  allowNegative?: boolean;
   onChange: (value: string) => void;
   value: string;
 }) {
@@ -210,7 +222,7 @@ function NumberInput({
     <input
       className="ui-input h-11 w-full px-4 text-sm"
       inputMode="decimal"
-      min="0"
+      min={allowNegative ? undefined : "0"}
       step="any"
       type="number"
       value={value}
