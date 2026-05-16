@@ -134,6 +134,12 @@ function DashboardInner() {
     () => positions.filter((position) => position.quantity > 0),
     [positions],
   );
+  const visibleTablePositions = useMemo(() => {
+    const tradedAssets = new Set(transactions.map((transaction) => transaction.asset));
+    return positions.filter(
+      (position) => position.quantity > 0 || tradedAssets.has(position.asset),
+    );
+  }, [positions, transactions]);
   const totals = useMemo(() => calculateTotals(positions), [positions]);
 
   const queryClient = useQueryClient();
@@ -279,7 +285,7 @@ function DashboardInner() {
                   </tr>
                 </thead>
                 <tbody>
-                  {visiblePositions.map((position) => (
+                  {visibleTablePositions.map((position) => (
                     <tr className="border-b border-slate-50 transition-colors hover:bg-slate-50/60 dark:border-slate-800/50 dark:hover:bg-slate-800/40" key={position.asset}>
                       <td className="w-20 py-3 font-medium text-slate-900 dark:text-slate-100 whitespace-nowrap">
                         <span className="inline-flex items-center gap-2">
@@ -303,7 +309,7 @@ function DashboardInner() {
                   ))}
                 </tbody>
               </table>
-              {visiblePositions.length === 0 ? (
+              {visibleTablePositions.length === 0 ? (
                 <div className="py-8 text-center text-sm text-slate-400 dark:text-slate-500">
                   暂无持仓数据
                 </div>
