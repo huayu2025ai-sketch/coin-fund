@@ -1,10 +1,12 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useMutation, useQuery, useQueryClient } from "@tanstack/react-query";
 import {
   Activity,
   ChevronDown,
+  ChevronLeft,
+  ChevronRight,
   Coins,
   Database,
   Flame,
@@ -84,6 +86,11 @@ export default function DashboardPage() {
 function DashboardInner() {
   const [createCollapsed, setCreateCollapsed] = useState(true);
   const [queryCollapsed, setQueryCollapsed] = useState(true);
+  const [filterAsset, setFilterAsset] = useState("");
+  const [filterDateStart, setFilterDateStart] = useState("");
+  const [filterDateEnd, setFilterDateEnd] = useState("");
+  const [pageSize, setPageSize] = useState(5);
+  const [currentPage, setCurrentPage] = useState(1);
   const userQuery = useQuery({
     queryKey: ["auth-user"],
     queryFn: fetchCurrentUserId,
@@ -105,6 +112,32 @@ function DashboardInner() {
     () => transactionsQuery.data ?? [],
     [transactionsQuery.data],
   );
+
+  const filteredTransactions = useMemo(() => {
+    return transactions.filter((tx) => {
+      if (filterAsset && tx.asset !== filterAsset) return false;
+      const txDate = tx.executed_at.slice(0, 10);
+      if (filterDateStart && txDate < filterDateStart) return false;
+      if (filterDateEnd && txDate > filterDateEnd) return false;
+      return true;
+    });
+  }, [transactions, filterAsset, filterDateStart, filterDateEnd]);
+
+  const totalPages = useMemo(
+    () => Math.max(1, Math.ceil(filteredTransactions.length / pageSize)),
+    [filteredTransactions.length, pageSize],
+  );
+
+  const paginatedTransactions = useMemo(() => {
+    return filteredTransactions.slice(
+      (currentPage - 1) * pageSize,
+      currentPage * pageSize,
+    );
+  }, [filteredTransactions, currentPage, pageSize]);
+
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [filterAsset, filterDateStart, filterDateEnd, pageSize]);
   const prices = useMemo(
     () =>
       pricesQuery.data ?? {
@@ -342,7 +375,7 @@ function DashboardInner() {
           >
             <div className="flex items-center gap-2">
               <h2 className="text-sm font-semibold text-slate-900 dark:text-slate-100">交易记录</h2>
-              <span className="text-xs text-slate-400 dark:text-slate-500">共 {transactions.length} 条</span>
+              <span className="text-xs text-slate-400 dark:text-slate-500">共 {filteredTransactions.length} 条</span>
             </div>
             <ChevronDown
               className={`h-4 w-4 text-slate-400 transition-transform duration-150 ease-out dark:text-slate-500 ${queryCollapsed ? "" : "rotate-180"}`}
@@ -354,69 +387,163 @@ function DashboardInner() {
               暂无交易记录，请在上方添加。
             </div>
           ) : (
-            <div className="overflow-x-auto">
-              <table className="w-full min-w-[640px] text-sm">
-                <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
-                  <tr className="border-b border-slate-100 dark:border-slate-800">
-                    <th className="py-2.5 font-medium">日期</th>
-                    <th className="py-2.5 font-medium">资产</th>
-                    <th className="py-2.5 text-right font-medium">数量</th>
-                    <th className="py-2.5 text-right font-medium">价格</th>
-                    <th className="py-2.5 text-right font-medium">手续费</th>
-                    <th className="py-2.5 text-right font-medium">现金投入</th>
-                    <th className="py-2.5 font-medium">备注</th>
-                    <th className="py-2.5 text-right font-medium">操作</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {transactions.map((tx) => (
-                    <tr
-                      className="border-b border-slate-50 transition-colors hover:bg-slate-50/60 dark:border-slate-800/50 dark:hover:bg-slate-800/40"
-                      key={tx.id}
-                    >
-                      <td className="py-3 text-slate-600 dark:text-slate-400">
-                        {new Date(tx.executed_at).toLocaleDateString("zh-CN")}
-                      </td>
-                      <td className="py-3 font-medium text-slate-900 dark:text-slate-100">
-                        <span className="inline-flex items-center gap-2">
-                          <AssetBadge asset={tx.asset} />
-                          {tx.asset}
-                        </span>
-                      </td>
-                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">
-                        {tx.quantity.toFixed(8)}
-                      </td>
-                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">
-                        {usd.format(tx.price_usd)}
-                      </td>
-                      <td className="py-3 text-right text-slate-600 dark:text-slate-400">
-                        {usd.format(tx.fee_usd)}
-                      </td>
-                      <td className="py-3 text-right font-medium text-slate-900 dark:text-slate-100">
-                        {usd.format(tx.cash_amount_usd)}
-                      </td>
-                      <td className="py-3 text-slate-500 dark:text-slate-400">
-                        {tx.note || "—"}
-                      </td>
-                      <td className="py-3 text-right">
-                        <button
-                          className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-950/30 dark:hover:text-red-400"
-                          disabled={deleteMutation.isPending}
-                          title="删除"
-                          onClick={() => {
-                            if (confirm("确定删除这条交易记录？")) {
-                              deleteMutation.mutate(tx.id);
-                            }
-                          }}
+            <>
+              {/* 过滤栏 */}
+              <div className="mb-4 flex flex-wrap items-end gap-3">
+                <div className="flex flex-col gap-1">
+                  <label className="ui-label">币种</label>
+                  <select
+                    className="ui-input px-3 py-1.5 text-sm"
+                    value={filterAsset}
+                    onChange={(e) => setFilterAsset(e.target.value)}
+                  >
+                    <option value="">全部</option>
+                    <option value="BTC">BTC</option>
+                    <option value="ETH">ETH</option>
+                    <option value="SOL">SOL</option>
+                    <option value="ATOM">ATOM</option>
+                  </select>
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="ui-label">开始日期</label>
+                  <input
+                    className="ui-input px-3 py-1.5 text-sm"
+                    type="date"
+                    value={filterDateStart}
+                    onChange={(e) => setFilterDateStart(e.target.value)}
+                  />
+                </div>
+                <div className="flex flex-col gap-1">
+                  <label className="ui-label">结束日期</label>
+                  <input
+                    className="ui-input px-3 py-1.5 text-sm"
+                    type="date"
+                    value={filterDateEnd}
+                    onChange={(e) => setFilterDateEnd(e.target.value)}
+                  />
+                </div>
+                <button
+                  className="ml-auto rounded-lg px-3 py-1.5 text-xs font-medium text-slate-500 transition-colors hover:bg-slate-100 dark:text-slate-400 dark:hover:bg-slate-800"
+                  onClick={() => {
+                    setFilterAsset("");
+                    setFilterDateStart("");
+                    setFilterDateEnd("");
+                    setCurrentPage(1);
+                  }}
+                  type="button"
+                >
+                  重置筛选
+                </button>
+              </div>
+
+              {filteredTransactions.length === 0 ? (
+                <div className="py-8 text-center text-sm text-slate-400 dark:text-slate-500">
+                  暂无符合条件的交易记录
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full min-w-[640px] text-sm">
+                    <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
+                      <tr className="border-b border-slate-100 dark:border-slate-800">
+                        <th className="py-2.5 font-medium">日期</th>
+                        <th className="py-2.5 font-medium">资产</th>
+                        <th className="py-2.5 text-right font-medium">数量</th>
+                        <th className="py-2.5 text-right font-medium">价格</th>
+                        <th className="py-2.5 text-right font-medium">手续费</th>
+                        <th className="py-2.5 text-right font-medium">现金投入</th>
+                        <th className="py-2.5 font-medium">备注</th>
+                        <th className="py-2.5 text-right font-medium">操作</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {paginatedTransactions.map((tx) => (
+                        <tr
+                          className="border-b border-slate-50 transition-colors hover:bg-slate-50/60 dark:border-slate-800/50 dark:hover:bg-slate-800/40"
+                          key={tx.id}
                         >
-                          <Trash2 className="h-3.5 w-3.5" />
-                        </button>
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
+                          <td className="py-3 text-slate-600 dark:text-slate-400">
+                            {new Date(tx.executed_at).toLocaleDateString("zh-CN")}
+                          </td>
+                          <td className="py-3 font-medium text-slate-900 dark:text-slate-100">
+                            <span className="inline-flex items-center gap-2">
+                              <AssetBadge asset={tx.asset} />
+                              {tx.asset}
+                            </span>
+                          </td>
+                          <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                            {tx.quantity.toFixed(8)}
+                          </td>
+                          <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                            {usd.format(tx.price_usd)}
+                          </td>
+                          <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                            {usd.format(tx.fee_usd)}
+                          </td>
+                          <td className="py-3 text-right font-medium text-slate-900 dark:text-slate-100">
+                            {usd.format(tx.cash_amount_usd)}
+                          </td>
+                          <td className="py-3 text-slate-500 dark:text-slate-400">
+                            {tx.note || "—"}
+                          </td>
+                          <td className="py-3 text-right">
+                            <button
+                              className="inline-flex h-7 w-7 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-red-50 hover:text-red-600 dark:text-slate-500 dark:hover:bg-red-950/30 dark:hover:text-red-400"
+                              disabled={deleteMutation.isPending}
+                              title="删除"
+                              onClick={() => {
+                                if (confirm("确定删除这条交易记录？")) {
+                                  deleteMutation.mutate(tx.id);
+                                }
+                              }}
+                            >
+                              <Trash2 className="h-3.5 w-3.5" />
+                            </button>
+                          </td>
+                        </tr>
+                      ))}
+                    </tbody>
+                  </table>
+
+                  {/* 分页控件 */}
+                  <div className="mt-4 flex flex-wrap items-center justify-between gap-3">
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400 dark:text-slate-500">每页</span>
+                      <select
+                        className="ui-input px-2 py-1 text-xs"
+                        value={pageSize}
+                        onChange={(e) => setPageSize(Number(e.target.value))}
+                      >
+                        <option value={5}>5</option>
+                        <option value={10}>10</option>
+                        <option value={20}>20</option>
+                      </select>
+                      <span className="text-xs text-slate-400 dark:text-slate-500">条</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-xs text-slate-400 dark:text-slate-500">
+                        第 {currentPage} / {totalPages} 页
+                      </span>
+                      <button
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 disabled:opacity-40 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+                        disabled={currentPage <= 1}
+                        onClick={() => setCurrentPage((p) => p - 1)}
+                        type="button"
+                      >
+                        <ChevronLeft className="h-3.5 w-3.5" />
+                      </button>
+                      <button
+                        className="inline-flex h-7 w-7 items-center justify-center rounded-lg border border-slate-200 text-slate-500 transition-colors hover:bg-slate-50 disabled:opacity-40 dark:border-slate-700 dark:text-slate-400 dark:hover:bg-slate-800"
+                        disabled={currentPage >= totalPages}
+                        onClick={() => setCurrentPage((p) => p + 1)}
+                        type="button"
+                      >
+                        <ChevronRight className="h-3.5 w-3.5" />
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              )}
+            </>
           )}
         </div>
       </div>
