@@ -51,7 +51,7 @@ export function calculatePositions(
       asset,
       quantity,
       costBasisUsd,
-      avgCostUsd: quantity === 0 ? 0 : costBasisUsd / quantity,
+      avgCostUsd: Math.abs(quantity) < 0.00000001 ? 0 : costBasisUsd / quantity,
       marketPriceUsd,
       marketValueUsd,
       originalCashUsd,
