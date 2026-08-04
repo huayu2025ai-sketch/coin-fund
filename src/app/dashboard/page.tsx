@@ -164,7 +164,7 @@ function DashboardInner() {
     [prices, transactions],
   );
   const visiblePositions = useMemo(
-    () => positions.filter((position) => position.quantity > 0),
+    () => positions.filter((position) => Math.abs(position.quantity) >= 0.00000001),
     [positions],
   );
   const visibleTablePositions = useMemo(() => {
