@@ -445,7 +445,7 @@ function DashboardInner() {
                   <table className="w-full min-w-[880px] table-fixed text-sm">
                     <colgroup>
                       <col className="w-[105px]" />
-                      <col className="w-[115px]" />
+                      <col className="w-[10ch]" />
                       <col className="w-[145px]" />
                       <col className="w-[120px]" />
                       <col className="w-[95px]" />
