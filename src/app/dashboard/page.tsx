@@ -442,17 +442,27 @@ function DashboardInner() {
                 </div>
               ) : (
                 <div className="overflow-x-auto">
-                  <table className="w-full min-w-[640px] text-sm">
+                  <table className="w-full min-w-[880px] table-fixed text-sm">
+                    <colgroup>
+                      <col className="w-[105px]" />
+                      <col className="w-[115px]" />
+                      <col className="w-[145px]" />
+                      <col className="w-[120px]" />
+                      <col className="w-[95px]" />
+                      <col className="w-[135px]" />
+                      <col className="w-[105px]" />
+                      <col className="w-[60px]" />
+                    </colgroup>
                     <thead className="text-left text-xs font-medium uppercase tracking-wider text-slate-400 dark:text-slate-500">
                       <tr className="border-b border-slate-100 dark:border-slate-800">
-                        <th className="py-2.5 font-medium">日期</th>
-                        <th className="py-2.5 font-medium">资产</th>
-                        <th className="py-2.5 text-right font-medium">数量</th>
-                        <th className="py-2.5 text-right font-medium">价格</th>
-                        <th className="py-2.5 text-right font-medium">手续费</th>
-                        <th className="py-2.5 text-right font-medium">现金投入</th>
-                        <th className="py-2.5 font-medium">备注</th>
-                        <th className="py-2.5 text-right font-medium">操作</th>
+                        <th className="whitespace-nowrap py-2.5 font-medium">日期</th>
+                        <th className="whitespace-nowrap py-2.5 font-medium">资产</th>
+                        <th className="whitespace-nowrap py-2.5 text-right font-medium">数量</th>
+                        <th className="whitespace-nowrap py-2.5 text-right font-medium">价格</th>
+                        <th className="whitespace-nowrap py-2.5 text-right font-medium">手续费</th>
+                        <th className="whitespace-nowrap py-2.5 text-right font-medium">现金投入</th>
+                        <th className="whitespace-nowrap py-2.5 font-medium">备注</th>
+                        <th className="whitespace-nowrap py-2.5 text-right font-medium">操作</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -461,28 +471,28 @@ function DashboardInner() {
                           className="border-b border-slate-50 transition-colors hover:bg-slate-50/60 dark:border-slate-800/50 dark:hover:bg-slate-800/40"
                           key={tx.id}
                         >
-                          <td className="py-3 text-slate-600 dark:text-slate-400">
+                          <td className="whitespace-nowrap py-3 text-slate-600 dark:text-slate-400">
                             {new Date(tx.executed_at).toLocaleDateString("zh-CN")}
                           </td>
-                          <td className="py-3 font-medium text-slate-900 dark:text-slate-100">
+                          <td className="whitespace-nowrap py-3 font-medium text-slate-900 dark:text-slate-100">
                             <span className="inline-flex items-center gap-2">
                               <AssetBadge asset={tx.asset} />
                               {tx.asset}
                             </span>
                           </td>
-                          <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                          <td className="whitespace-nowrap py-3 text-right text-slate-600 dark:text-slate-400 tabular-nums">
                             {tx.quantity.toFixed(8)}
                           </td>
-                          <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                          <td className="whitespace-nowrap py-3 text-right text-slate-600 dark:text-slate-400 tabular-nums">
                             {usd.format(tx.price_usd)}
                           </td>
-                          <td className="py-3 text-right text-slate-600 dark:text-slate-400">
+                          <td className="whitespace-nowrap py-3 text-right text-slate-600 dark:text-slate-400 tabular-nums">
                             {usd.format(tx.fee_usd)}
                           </td>
-                          <td className="py-3 text-right font-medium text-slate-900 dark:text-slate-100">
+                          <td className="whitespace-nowrap py-3 text-right font-medium text-slate-900 dark:text-slate-100 tabular-nums">
                             {usd.format(tx.cash_amount_usd)}
                           </td>
-                          <td className="py-3 text-slate-500 dark:text-slate-400">
+                          <td className="truncate py-3 text-slate-500 dark:text-slate-400" title={tx.note || undefined}>
                             {tx.note || "—"}
                           </td>
                           <td className="py-3 text-right">
