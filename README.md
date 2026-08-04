@@ -1,17 +1,21 @@
 # Crypto2028 Portfolio
 
-私人加密货币投资组合追踪器，支持 BTC、ETH 和 SOL 的持仓管理与盈亏分析。
+私人加密货币投资组合追踪器，支持 BTC、ETH、SOL、ATOM 的持仓管理与盈亏分析。
 
 ## 功能特性
 
-- **持仓追踪**：实时追踪 BTC、ETH、SOL 三种资产的持仓情况
+- **持仓追踪**：实时追踪 BTC、ETH、SOL、ATOM 四种资产的持仓情况，支持零持仓但有交易历史的资产
 - **交易记录**：支持两种交易类型
-  - **DCA（定投）**：记录每月现金购买的数量、价格和手续费
-  - **兑换（Conversion）**：记录山寨币兑换为主要资产的详细信息
+  - **DCA（定投）**：记录现金购买的数量、价格、手续费和现金金额
+  - **兑换（Conversion）**：记录山寨币兑换为主要资产的详细信息（来源代币、数量、成本）
+  - **卖出**：支持以负数量记录卖出交易，自动计算现金回收
 - **盈亏分析**：自动计算成本基准、平均成本、盈亏和收益率
+- **交易管理**：分页展示、按资产/日期过滤、可折叠的交易记录卡片
 - **数据可视化**：使用图表展示资产配置和资金来源分布
 - **价格监控**：通过 CoinGecko API 获取实时价格，每 30 秒自动刷新
 - **用户认证**：基于 Supabase Auth 的邮箱密码登录，数据通过 RLS 隔离
+- **多账户切换**：仪表盘支持快速切换用户角色（演示数据管理员）
+- **主题切换**：支持浅色/深色主题
 
 ## 技术栈
 
@@ -101,8 +105,10 @@ npm run start
 
 ### 枚举类型
 
-- `crypto_asset`：BTC、ETH、SOL
+- `crypto_asset`：BTC、ETH、SOL、ATOM
 - `transaction_kind`：DCA（定投）、CONVERSION（兑换）
+
+> **卖出**：通过 `quantity < 0` 的 DCA 交易实现，不占用独立枚举值。
 
 ### 数据表
 
@@ -113,17 +119,21 @@ npm run start
 | `id` | 主键 |
 | `user_id` | 关联 `auth.users`，RLS 隔离 |
 | `kind` | 交易类型：DCA 或 CONVERSION |
-| `asset` | 目标资产：BTC / ETH / SOL |
-| `quantity` | 获得数量 |
+| `asset` | 目标资产：BTC / ETH / SOL / ATOM |
+| `quantity` | 数量（卖出时为负数） |
 | `price_usd` | 成交价格（USD） |
 | `fee_usd` | 手续费（USD） |
+| `cash_amount_usd` | 现金金额（DCA） |
+| `conversion_value_usd` | 兑换价值（CONVERSION） |
+| `source_altcoin_symbol` | 兑换来源代币符号（仅 CONVERSION） |
+| `source_altcoin_quantity` | 兑换来源数量（仅 CONVERSION） |
+| `source_altcoin_cost_usd` | 兑换来源成本（仅 CONVERSION） |
+| `note` | 交易备注 |
 | `executed_at` | 成交时间 |
-| `source_token` | 兑换来源代币（仅 CONVERSION） |
-| `source_quantity` | 兑换来源数量（仅 CONVERSION） |
 | `created_at` / `updated_at` | 自动时间戳 |
 
 - RLS 已启用：用户只能操作自己的数据
-- 检查约束：根据 `kind` 自动校验字段完整性
+- 检查约束：`quantity <> 0`；根据 `kind` 自动校验 DCA/Conversion 字段完整性
 - 索引：`(user_id, asset, executed_at desc)`
 
 ### 数据库视图
@@ -191,8 +201,8 @@ CoinGecko 请求失败时返回零价格并标记 `stale: true`。仪表盘每 3
 
 ### 添加新资产
 
-1. 在 `supabase/schema.sql` 中更新 `crypto_asset` 枚举
-2. 在 `src/lib/portfolio.ts` 中更新 `Asset` 类型和 `assets` 数组
+1. 在 `supabase/schema.sql` 中更新 `crypto_asset` 枚举（`ALTER TYPE ... ADD VALUE`）
+2. 在 `src/lib/portfolio.ts` 中更新 `Asset` 类型和 `calculatePositions` 中的资产列表
 3. 在 `src/app/api/prices/route.ts` 中更新 CoinGecko URL 和映射
 4. 更新仪表盘 UI 标签
 
